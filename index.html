@@ -1843,7 +1843,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const apellido = document.getElementById("apellido").value;
       const celular = document.getElementById("celular").value;
       const email = document.getElementById("email").value;
-      const password = nombre+'alumno2025';
+      const password = nombre+'2025';
       
       const alumno = await registrarAlumno(nombre, apellido, celular, email, password);
       const curso_id = 1;
@@ -1855,7 +1855,7 @@ document.addEventListener("DOMContentLoaded", function() {
       submitBtn.style.background = "#28a745";
       
       // Mostrar la contraseña generada
-      alert(`Tu contraseña generada es: ${password}\nPor favor, guárdala en un lugar seguro.`);
+      alert(`Tu contraseña generada es: ${password}\nPor favor, guárdala en un lugar seguro, es para iniciar sesión en la plataforma educativa`);
       
       setTimeout(() => {
         nextStep();
