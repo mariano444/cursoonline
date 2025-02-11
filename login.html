@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso al Curso</title>
+  <!-- Fuentes y Tailwind CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Animate.css para animaciones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Fondo animado en degradado */
+      background: linear-gradient(135deg, #2a4d8f, #4e73df);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+  <script>
+    // Inicialización del cliente de Supabase (usa tus credenciales)
+    window.supabase = supabase.createClient(
+      'https://hygdbhdujdvtuuagwfit.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5Z2RiaGR1amR2dHV1YWd3Zml0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg3Nzg3MzUsImV4cCI6MjA1NDM1NDczNX0.jDIZD6cXQHjkojSg_vJ0Q_cvTXVEG_B_NaiRnJZTDas'
+    );
+
+    // Se usa la tabla "alumnos" para autenticar al usuario
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      // Deshabilitar el botón y mostrar spinner
+      const btn = document.getElementById("login-button");
+      btn.disabled = true;
+      btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3 inline-block" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="#fff" stroke-width="4"></circle><path class="opacity-75" fill="#fff" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Iniciando...';
+
+      // Buscar en la tabla "alumnos" el usuario con el email y password ingresados
+      const { data: alumno, error } = await supabase
+        .from("alumnos")
+        .select("*")
+        .eq("email", email)
+        .eq("password", password)
+        .single();
+      
+      if (error || !alumno) {
+        document.getElementById("error-message").innerText = "Error en el inicio de sesión. Verifica tus credenciales.";
+        btn.disabled = false;
+        btn.innerText = 'Ingresar';
+        return;
+      }
+      
+      // Guardar la información del usuario en el sessionStorage (opcional)
+      sessionStorage.setItem("user", JSON.stringify(alumno));
+      
+      // Verificar si el usuario tiene una compra con estado "pagado"
+      checkPayment(alumno.id);
+    }
+    
+    async function checkPayment(userId) {
+      const { data, error } = await supabase
+        .from("compras")
+        .select("estado")
+        .eq("alumno_id", userId)
+        .eq("estado", "pagado");
+      
+      // Animar la salida de la sección de login
+      const loginSection = document.getElementById("login-section");
+      loginSection.classList.add("animate__fadeOut");
+      
+      setTimeout(() => {
+        loginSection.classList.add("hidden");
+        if (error || data.length === 0) {
+          const paymentSection = document.getElementById("payment-section");
+          paymentSection.classList.remove("hidden");
+          paymentSection.classList.add("animate__fadeInUp");
+        } else {
+          const courseContent = document.getElementById("course-content");
+          courseContent.classList.remove("hidden");
+          courseContent.classList.add("animate__fadeInUp");
+        }
+      }, 500);
+    }
+  </script>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+  <!-- Sección de Login -->
+  <div id="login-section" class="bg-white p-8 rounded-lg shadow-2xl w-96 text-center animate__animated animate__fadeInDown">
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Bienvenido</h2>
+    <p class="text-gray-600 mb-6">Accede a tu curso profesional y desbloquea tu potencial.</p>
+    <div id="error-message" class="text-red-500 mb-4"></div>
+    <input type="email" id="email" placeholder="Correo" class="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:border-blue-600" required>
+    <input type="password" id="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded mb-6 focus:outline-none focus:border-blue-600" required>
+    <button id="login-button" onclick="login()" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition duration-300">
+      Ingresar
+    </button>
+  </div>
+  
+  <!-- Sección de Pago (si no está pagado) -->
+  <div id="payment-section" class="hidden bg-white p-8 rounded-lg shadow-2xl w-96 text-center animate__animated">
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Acceso Restringido</h2>
+    <p class="text-gray-600 mb-6">Para acceder al curso, es necesario realizar el pago.</p>
+    <button onclick="window.location.href='pago.html'" class="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700 transition duration-300 animate__animated animate__pulse animate__infinite">
+      Pagar Ahora
+    </button>
+  </div>
+  
+  <!-- Sección de Contenido del Curso (si está pagado) -->
+  <div id="course-content" class="hidden bg-white p-8 rounded-lg shadow-2xl w-96 text-center animate__animated">
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">¡Felicidades!</h2>
+    <p class="text-gray-600 mb-6">Has accedido al curso. Prepárate para transformar tu carrera.</p>
+    <a href="n.html" class="inline-block w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition duration-300">
+      Ir al Curso
+    </a>
+  </div>
+</body>
+</html>
