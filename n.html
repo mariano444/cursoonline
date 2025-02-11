@@ -1,0 +1,2788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curso Profesional: Liquidación de Sueldos en Argentina</title>
+  <!-- Fuentes y Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* VARIABLES Y RESET */
+    :root {
+      --primary-color: #2a4d8f;
+      --secondary-color: #4e73df;
+      --accent-color: #f0f4f8;
+      --info-color: #17a2b8;
+      --success-color: #55aa55;
+      --light-bg: #f4f4f4;
+      --light-text: #333;
+      --dark-bg: #1f1f1f;
+      --dark-text: #eee;
+      --border-color: #ddd;
+      --font-base: 'Roboto', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-base);
+      background-color: var(--light-bg);
+      color: var(--light-text);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark {
+      background-color: var(--dark-bg);
+      color: var(--dark-text);
+    }
+    /* NAVEGACIÓN */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      transition: background 0.3s;
+    }
+    body.dark nav { background: rgba(30,30,30,0.98); }
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      list-style: none;
+    }
+    nav ul li a {
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    nav ul li a:hover { color: var(--secondary-color); }
+    #darkModeToggle {
+      padding: 8px 15px;
+      border: none;
+      background: var(--primary-color);
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #darkModeToggle:hover { background: var(--secondary-color); }
+    .spacer { height: 70px; }
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      text-align: center;
+      padding: 120px 20px 60px;
+      animation: fadeInDown 1s ease-out;
+    }
+    header h1 { font-size: 3rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    header p { font-size: 1.2rem; }
+    /* CONTENEDOR PRINCIPAL */
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      background: var(--accent-color);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      animation: fadeInUp 1s ease-out;
+    }
+    /* TEMARIO */
+    .syllabus {
+      margin-bottom: 50px;
+      padding: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+    }
+    body.dark .syllabus { background: #2b2b2b; }
+    .syllabus h2 { font-size: 2rem; margin-bottom: 15px; color: var(--primary-color); }
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+      margin-top: 20px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15px;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+      border-radius: 2px;
+      animation: slideIn 1s ease-out;
+    }
+    .timeline-item {
+      margin-bottom: 20px;
+      position: relative;
+      animation: fadeIn 1s ease-out;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -25px;
+      top: 5px;
+      width: 16px;
+      height: 16px;
+      background: var(--secondary-color);
+      border: 4px solid #fff;
+      border-radius: 50%;
+    }
+    .syllabus ul { list-style: none; margin-left: 20px; }
+    .syllabus li { margin-bottom: 10px; font-size: 1rem; }
+    /* MÓDULOS */
+    .module {
+      margin-bottom: 50px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    body.dark .module { background: #333; }
+    .module h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .module p, .module li { margin-bottom: 15px; font-size: 1rem; }
+    .module ul { margin-left: 20px; }
+    .locked { display: none; }
+    /* NOTAS Y TOOLTIP */
+    .note {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      color: #856404;
+      animation: fadeIn 1s ease-out;
+    }
+    body.dark .note {
+      background: #665c3c;
+      border-color: #8b7e2f;
+      color: #f1e7c1;
+    }
+    .tooltip {
+      position: relative;
+      cursor: help;
+      border-bottom: 1px dotted var(--primary-color);
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: var(--secondary-color);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    /* ACCORDION */
+    .accordion {
+      background: #f7f7f7;
+      border-left: 5px solid var(--primary-color);
+      border-radius: 5px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .accordion.dark { background: #444; }
+    .accordion h3 {
+      padding: 15px;
+      cursor: pointer;
+      background: inherit;
+      color: inherit;
+      user-select: none;
+      font-weight: 500;
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      padding: 0 15px;
+    }
+    .accordion.active .accordion-content {
+      padding: 15px;
+      max-height: 800px;
+    }
+    /* FORMULARIOS Y CALCULADORAS */
+    form { display: flex; flex-direction: column; }
+    label { margin: 10px 0 5px; font-weight: 500; }
+    input, select {
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 5px;
+      transition: border-color 0.3s, background-color 0.3s;
+      background: #fff;
+    }
+    input:focus, select:focus { border-color: var(--primary-color); outline: none; }
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      border: none;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+    .result { margin-top: 20px; font-size: 1.2rem; font-weight: 600; color: var(--primary-color); }
+    /* QUIZZES */
+    .quiz-section { margin-top: 25px; }
+    .quiz-question { margin-bottom: 20px; animation: slideIn 0.8s ease-out; }
+    .quiz-question label { font-weight: 600; margin-bottom: 10px; display: block; }
+    /* RECIBO DE SUELDO */
+    .payslip {
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeIn 1s ease-out;
+    }
+    .payslip table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .payslip th, .payslip td {
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .payslip th { background: var(--primary-color); color: #fff; }
+    .payslip-input {
+      width: 100%;
+      padding: 5px;
+      font-size: 0.9rem;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+    }
+    /* MÓDULOS DE COMPLEMENTOS SALARIALES */
+    /* Módulo 12: SAC */
+    .module-sac {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-sac h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
+    .module-sac p, .module-sac li { margin-bottom: 15px; font-size: 1rem; }
+    .module-sac ul { margin-left: 20px; }
+    /* Módulo 13: Vacaciones */
+    .module-vacaciones {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-vacaciones h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
+    .module-vacaciones p, .module-vacaciones li { margin-bottom: 15px; font-size: 1rem; }
+    .module-vacaciones ul { margin-left: 20px; }
+    /* Módulo 14: Horas Extras */
+    .module-horas {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-horas h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
+    .module-horas p, .module-horas li { margin-bottom: 15px; font-size: 1rem; }
+    .module-horas ul { margin-left: 20px; }
+    /* Módulo 15: Casos Especiales */
+    .module-special {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-special h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
+    .module-special p, .module-special li { margin-bottom: 15px; font-size: 1rem; }
+    .module-special ul { margin-left: 20px; }
+    /* Módulo 16: FAQ */
+    .faq {
+      margin-top: 20px;
+      padding: 20px;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeIn 1s ease-out;
+    }
+    .faq h3 { font-size: 1.8rem; margin-bottom: 15px; color: var(--primary-color); }
+    .faq-item {
+      margin-bottom: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .faq-item:hover { background: var(--secondary-color); color: #fff; }
+    .faq-answer {
+      display: none;
+      padding: 10px;
+      border-left: 3px solid var(--primary-color);
+      margin-left: 15px;
+      font-size: 0.95rem;
+    }
+    /* Módulo 17: Examen Final */
+    .module-exam {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-exam h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
+    .module-exam p, .module-exam li { margin-bottom: 15px; font-size: 1rem; }
+    /* Módulo 18: Conclusiones y Recursos Adicionales */
+    .module-additional {
+      margin-top: 20px;
+      padding: 30px;
+      border: 2px dashed var(--secondary-color);
+      border-radius: 10px;
+      background: #fff;
+      animation: fadeInUp 1s ease-out;
+    }
+    .module-additional h2 { font-size: 2rem; margin-bottom: 20px; color: var(--secondary-color); }
+    .module-additional p, .module-additional li { margin-bottom: 15px; font-size: 1rem; }
+    /* MODAL CERTIFICADO */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      animation: bounceIn 1s ease-out;
+    }
+    .modal-content h3 { margin-bottom: 15px; color: var(--primary-color); }
+    /* MATERIAL DE ESTUDIO */
+    .study-info {
+      background: #e6f7ff;
+      border: 1px solid #b3e5fc;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+    body.dark .study-info {
+      background: #36454f;
+      border: 1px solid #4a6a78;
+    }
+
+    /*evaluacion final*/
+
+    /* Modal de Instrucciones */
+
+    .btn-start {
+      margin-top: 20px;
+      padding: 15px 30px;
+      border: none;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size:1.1rem;
+    }
+    /* Sección del Examen */
+    .module-exam {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .activity {
+      margin-bottom: 25px;
+      padding: 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--accent-color);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .btn-verify {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-verify:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    .btn-finish, .btn-reset {
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  #progress {
+    height: 20px;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    transition: width 0.5s ease-in-out;
+  }
+
+    /* ANIMACIONES */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    /* RESPONSIVE */
+    @media(max-width: 768px) {
+      header h1 { font-size: 2.2rem; }
+      nav ul li { margin: 0 8px; }
+      main { padding: 20px; }
+      .module h2, .syllabus h2 { font-size: 1.5rem; }
+    }
+
+    .module-approved {
+  border: 2px solid #4CAF50;
+  box-shadow: 0 0 10px #4CAF50;
+  transition: all 0.3s ease;
+}
+
+.approved-banner {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(5px); }
+  50% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.profile-section {
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  
+  .section-title {
+    color: #2a4d8f;
+    font-size: 2rem;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .profile-card,
+  .progress-card,
+  .motivation-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-card:hover,
+  .progress-card:hover,
+  .motivation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    background-color: #4e73df;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+  }
+
+  .profile-avatar i {
+    font-size: 30px;
+    color: white;
+  }
+
+  .profile-name h3 {
+    margin: 0;
+    color: #2a4d8f;
+    font-size: 1.4rem;
+  }
+
+  .profile-info p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .profile-info i,
+  .progress-card i,
+  .motivation-card i {
+    margin-right: 10px;
+    color: #4e73df;
+    font-size: 1.2rem;
+  }
+
+  .progress-card h3,
+  .motivation-card h3 {
+    color: #2a4d8f;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+  }
+
+  .progress-bar {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin-top: 15px;
+  }
+
+  #progress {
+    background-color: #4e73df;
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+    border-radius: 10px;
+  }
+
+  .motivation-card {
+    background-color: #e8f4fd;
+    border-left: 5px solid #4e73df;
+  }
+
+  .motivation-card p {
+    font-style: italic;
+    color: #495057;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .profile-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  </style>
+</head>
+<body>
+  <!-- NAVEGACIÓN -->
+  <nav>
+    <ul>
+      <li><a href="#syllabus"><i class="fas fa-book"></i> Temario</a></li>
+      <!--li><a href="#module1"><i class="fas fa-play-circle"></i> Módulo 1</a></li>
+      <li><a href="#module2"><i class="fas fa-play-circle"></i> Módulo 2</a></li>
+      <li><a href="#module3"><i class="fas fa-play-circle"></i> Módulo 3</a></li>
+      <li><a href="#module4"><i class="fas fa-play-circle"></i> Módulo 4</a></li>
+      <li><a href="#module5"><i class="fas fa-play-circle"></i> Módulo 5</a></li>
+      <li><a href="#module6"><i class="fas fa-play-circle"></i> Módulo 6</a></li>
+      <li><a href="#module7"><i class="fas fa-play-circle"></i> Módulo 7</a></li>
+      <li><a href="#module8"><i class="fas fa-play-circle"></i> Módulo 8</a></li>
+      <li><a href="#module9"><i class="fas fa-play-circle"></i> Módulo 9</a></li>
+      <li><a href="#module10"><i class="fas fa-play-circle"></i> Módulo 10</a></li>
+      <li><a href="#module11"><i class="fas fa-play-circle"></i> Módulo 11</a></li>
+      <li><a href="#module12"><i class="fas fa-play-circle"></i> Módulo 12</a></li>
+      <li><a href="#module13"><i class="fas fa-play-circle"></i> Módulo 13</a></li>
+      <li><a href="#module14"><i class="fas fa-play-circle"></i> Módulo 14</a></li>
+      <li><a href="#module15"><i class="fas fa-play-circle"></i> Módulo 15</a></li>
+      <li><a href="#module16"><i class="fas fa-play-circle"></i> Módulo 16</a></li>
+      <li><a href="#module17"><i class="fas fa-play-circle"></i> Módulo 17</a></li>
+      <li><a href="#module18"><i class="fas fa-play-circle"></i> Módulo 18</a></li-->
+        <button class="logout" onclick="logout()">Cerrar Sesión</button>
+    </ul>
+    <button id="darkModeToggle">Modo Oscuro</button>
+  </nav>
+  <div class="spacer"></div>
+  
+  <!-- HEADER -->
+  <header>
+    <h1 style="justify-content: center;"><i class="fas fa-graduation-cap"></i> Curso Profesional: Liquidación de Sueldos</h1>
+    <p>Una experiencia interactiva y completa para dominar el cálculo, la normativa y la interpretación de nóminas en Argentina</p>
+  </header>
+   <!-- CONTENIDO PRINCIPAL id="perfil" class="profile-section"-->
+   <main>
+  <section >
+    <h2 class="section-title"><i class="fas fa-user-circle"></i> Perfil del Usuario</h2>
+    <div class="profile-grid">
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="profile-name">
+            <h3><span id="nombre"></span> <span id="apellido"></span></h3>
+          </div>
+        </div>
+        <div class="profile-info">
+          <p><i class="fas fa-envelope"></i> <span id="email"></span></p>
+          <p><i class="fas fa-phone"></i> <span id="celular"></span></p>
+        </div>
+      </div>
+      <div class="progress-card">
+        <h3><i class="fas fa-chart-line"></i> Progreso del Curso</h3>
+        <p><strong>Módulo Actual:</strong> <span id="modulo_actual"></span></p>
+        <p><strong>Avance:</strong> <span id="porcentaje_completado"></span>%</p>
+        <div class="progress-bar">
+          <div id="progress" style="width: 0%;"></div>
+        </div>
+      </div>
+      <div class="motivation-card">
+        <h3><i class="fas fa-lightbulb"></i> Mensaje Motivacional</h3>
+        <p id="mensaje_motivacional"></p>
+      </div>
+    </div>
+  </section>
+
+<br>
+    <!-- TEMARIO -->
+    <section id="syllabus" class="syllabus">
+      <h2><i class="fas fa-list"></i> Temario del Curso</h2>
+      <p>Este curso se divide en 18 módulos que abarcan desde fundamentos teóricos hasta casos especiales y un examen final exhaustivo. Cada módulo incluye explicaciones detalladas, ejemplos prácticos, ejercicios interactivos y material de estudio para profundizar en cada tema.</p>
+      <div class="timeline">
+        <div class="timeline-item">Módulo 1: Introducción y Fundamentos</div>
+        <div class="timeline-item">Módulo 2: Conceptos Básicos de Liquidación</div>
+        <div class="timeline-item">Módulo 3: Estructura del Recibo de Sueldo</div>
+        <div class="timeline-item">Módulo 4: Deducciones Legales I - Aportes Jubilatorios</div>
+        <div class="timeline-item">Módulo 5: Deducciones Legales II - Obra Social y PAMI</div>
+        <div class="timeline-item">Módulo 6: Normativas y Leyes (Ley 20.744)</div>
+        <div class="timeline-item">Módulo 7: Cálculo del Salario Neto</div>
+        <div class="timeline-item">Módulo 8: Calculadora Básica</div>
+        <div class="timeline-item">Módulo 9: Calculadora Avanzada</div>
+        <div class="timeline-item">Módulo 10: Ejemplo Real de Recibo</div>
+        <div class="timeline-item">Módulo 11: Actividad Práctica – Completar Recibo</div>
+        <div class="timeline-item">Módulo 12: Complementos – SAC</div>
+        <div class="timeline-item">Módulo 13: Complementos – Vacaciones</div>
+        <div class="timeline-item">Módulo 14: Complementos – Horas Extras</div>
+        <div class="timeline-item">Módulo 15: Casos Especiales</div>
+        <div class="timeline-item">Módulo 16: FAQ</div>
+        <div class="timeline-item">Módulo 17: Examen Final</div>
+        <div class="timeline-item">Módulo 18: Conclusiones y Recursos</div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 1: Introducción y Fundamentos -->
+    <section id="module1" class="module">
+      <h2><i class="fas fa-play-circle"></i> Módulo 1: Introducción y Fundamentos</h2>
+      <p>Este módulo introduce los conceptos esenciales para comprender la liquidación de sueldos en Argentina. Se abordarán las bases legales, económicas y administrativas que rigen este proceso.</p>
+      <h3>¿Qué es la liquidación de sueldos?</h3>
+      <p>La liquidación de sueldos es el proceso mediante el cual un empleador calcula, deduce y paga las remuneraciones de sus empleados, según las normativas vigentes.</p>
+      <h3>Fundamentos Legales</h3>
+      <p>Las normas que regulan la liquidación de sueldos incluyen:</p>
+      <ul>
+        <li><strong>Ley de Contrato de Trabajo (20.744):</strong> Marco legal general sobre los derechos y obligaciones del empleador y el empleado.</li>
+        <li><strong>Convenios Colectivos de Trabajo (CCT):</strong> Acuerdos entre sindicatos y empleadores que establecen condiciones específicas.</li>
+        <li><strong>Normativas de la AFIP:</strong> Determinan cómo deben realizarse los aportes y retenciones.</li>
+      </ul>
+      <h3>Conceptos Claves</h3>
+      <ul>
+        <li><strong>Salario Bruto:</strong> Monto total acordado antes de deducciones.</li>
+        <li><strong>Salario Neto:</strong> Monto que recibe el trabajador tras deducciones.</li>
+        <li><strong>Deducciones:</strong> Impuestos, aportes previsionales y otros descuentos obligatorios.</li>
+      </ul>
+      <div class="note"><i class="fas fa-lightbulb"></i> Comprender estos conceptos es crucial para el análisis de cualquier liquidación de sueldo.</div>
+      <div class="quiz-section" id="quizModule1">
+        <div class="quiz-question">
+          <label for="m1q1">1. ¿Qué es el salario bruto?</label>
+          <select id="m1q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El monto final recibido.</option>
+            <option value="b">La suma total de ingresos antes de descuentos.</option>
+            <option value="c">El total de descuentos aplicados.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m1q2">2. ¿Cuál de los siguientes es esencial para definir el salario?</label>
+          <select id="m1q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Solo el salario bruto.</option>
+            <option value="b">Solo el salario neto.</option>
+            <option value="c">Tanto el salario bruto como el neto.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule1()">Enviar Evaluación</button>
+        <div id="resultModule1" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 2: Conceptos Básicos de Liquidación -->
+    <section id="module2" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> MÓDULO 2: Conceptos Básicos de Liquidación</h2>
+      <p>
+        Este módulo profundiza en los componentes esenciales que integran la liquidación de sueldos. Se explica de forma detallada cada elemento que conforma el cálculo final, haciendo especial énfasis en la identificación y aplicación de deducciones y percepciones.
+      </p>
+    
+      <h3>Componentes de la Liquidación</h3>
+      <ul>
+        <li>
+          <strong>Percepciones:</strong> Son todos los ingresos que constituyen el salario bruto. Estos incluyen:
+          <ul>
+            <li>Sueldo básico</li>
+            <li>Bonificaciones e incentivos</li>
+            <li>Horas extras y comisiones</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Deducciones Obligatorias:</strong> Son los descuentos que se aplican por mandato de la ley, entre los cuales se encuentran:
+          <ul>
+            <li>Aportes jubilatorios</li>
+            <li>Contribuciones a la obra social</li>
+            <li>Descuentos para el PAMI</li>
+            <li>Otros impuestos y retenciones fiscales</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Conceptos Complementarios:</strong> Además del sueldo base, pueden incluirse otros ingresos variables, como premios o incentivos especiales, que pueden ser sujetos a condiciones particulares definidas en el convenio colectivo o en políticas internas de la empresa.
+        </li>
+      </ul>
+    
+      <h3>Procedimiento de Cálculo</h3>
+      <p>
+        El proceso para calcular la liquidación de sueldos sigue generalmente estos pasos:
+      </p>
+      <ul>
+        <li>
+          <strong>Determinación del Salario Bruto:</strong> Sumar todos los conceptos remunerativos pactados, sin aplicar descuentos.
+        </li>
+        <li>
+          <strong>Aplicación de Deducciones:</strong> Restar de ese total los descuentos obligatorios establecidos por la normativa vigente. Cada deducción se calcula aplicando el porcentaje o monto fijo según la ley o convenio.
+        </li>
+        <li>
+          <strong>Cálculo del Salario Neto:</strong> El resultado final, tras aplicar todas las deducciones, representa el monto que realmente percibe el trabajador.
+        </li>
+      </ul>
+    
+      <h3>Importancia de una Liquidación Precisa</h3>
+      <p>
+        La precisión en la liquidación es vital para:
+      </p>
+      <ul>
+        <li>
+          Evitar discrepancias que puedan generar conflictos laborales o inspecciones por parte de organismos reguladores.
+        </li>
+        <li>
+          Asegurar que todos los descuentos y aportes se realicen de acuerdo a la normativa, protegiendo tanto los derechos del trabajador como las obligaciones del empleador.
+        </li>
+        <li>
+          Optimizar la gestión administrativa de la empresa, facilitando auditorías internas y externas.
+        </li>
+      </ul>
+    
+      <div class="study-info">
+        <h3>Material de Estudio Recomendado</h3>
+        <p>
+          Para profundizar en estos conceptos, se recomienda el estudio de manuales especializados como el "Manual de Liquidación de Sueldos" y el uso de simuladores en línea que permitan practicar el cálculo con diversos escenarios. Además, es útil la consulta de artículos y publicaciones de organismos oficiales.
+        </p>
+      </div>
+      <div class="note">
+        <i class="fas fa-info"></i> Comprender en detalle cada elemento de la liquidación es esencial para evitar errores y garantizar el cumplimiento de la legislación laboral.
+      </div>
+      <div class="quiz-section" id="quizModule2">
+        <div class="quiz-question">
+          <label for="m2q1">1. ¿Qué es el salario neto?</label>
+          <select id="m2q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El total antes de descuentos.</option>
+            <option value="b">El monto final después de deducciones.</option>
+            <option value="c">La suma de descuentos.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m2q2">2. ¿Qué deducción NO es considerada obligatoria?</label>
+          <select id="m2q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Aportes jubilatorios.</option>
+            <option value="b">Obra social.</option>
+            <option value="c">Bonificaciones por desempeño.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule2()">Enviar Evaluación</button>
+        <div id="resultModule2" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 3: Estructura del Recibo de Sueldo -->
+    <section id="module3" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 3: Estructura del Recibo de Sueldo</h2>
+      <p>El recibo de sueldo es un documento legal y contable que no solo acredita el pago de la remuneración, sino que además es un instrumento de transparencia y control interno. Su correcta confección es esencial para la validación de derechos laborales, la presentación de pruebas en auditorías internas y externas, y para respaldar reclamos en conflictos laborales.</p>
+      <h3>Elementos Claves y Función de Cada Sección</h3>
+      <ul>
+        <li><strong>Encabezado:</strong> Presenta datos críticos del empleador (razón social, domicilio, CUIT) y del trabajador (nombre, CUIL, categoría profesional, antigüedad y fecha de ingreso). Esta sección garantiza la identificación única de la relación laboral y cumple con los requisitos establecidos en el artículo 140 de la Ley de Contrato de Trabajo.</li>
+        <li><strong>Percepciones:</strong> Se detallan los conceptos remunerativos –incluyendo sueldo básico, horas extras, bonificaciones, adicionales (tanto remunerativos como no remunerativos), viáticos y reintegros– que conforman el salario bruto. En esta parte se integran también elementos variables que pueden afectar la base de cálculo para otros beneficios (aguinaldo, vacaciones e indemnizaciones).</li>
+        <li><strong>Deducciones:</strong> Incluye los descuentos obligatorios (aportaciones jubilatorias, obra social, PAMI, cuotas sindicales) y retenciones fiscales (por impuesto a las Ganancias u otros tributos). Este desglose es fundamental para comprender el costo laboral real y para el análisis de la carga tributaria y previsional del trabajador.</li>
+        <li><strong>Total Neto:</strong> Es el resultado de restar todas las deducciones al total de percepciones, representando el monto efectivo que recibe el empleado. Este importe es clave para verificar la exactitud de la liquidación y para futuros trámites financieros y crediticios.</li>
+      </ul>
+      <h3>Análisis y Consideraciones Avanzadas</h3>
+      <p>La estructura del recibo de sueldo permite analizar no solo la remuneración, sino también el impacto de las deducciones en el poder adquisitivo del trabajador. Aspectos como la evolución de los porcentajes de aportes en función de la economía, la integración de componentes variables y el rol de la digitalización en la emisión de comprobantes (recibos electrónicos) son fundamentales para una gestión moderna y transparente.</p>
+      <div class="quiz-section" id="quizModule3">
+        <div class="quiz-question">
+          <label for="m3q1">1. ¿Cuál de estos elementos NO forma parte de un recibo de sueldo?</label>
+          <select id="m3q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Datos del empleado.</option>
+            <option value="b">Historial crediticio.</option>
+            <option value="c">Percepciones y deducciones.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m3q2">2. ¿Por qué es importante estructurar correctamente un recibo de sueldo?</label>
+          <select id="m3q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Para facilitar auditorías y revisiones.</option>
+            <option value="b">Solo para cumplir requisitos legales.</option>
+            <option value="c">No es relevante su estructura.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule3()">Enviar Evaluación</button>
+        <div id="resultModule3" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 4: Deducciones Legales I - Aportes Jubilatorios -->
+    <section id="module4" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 4: Deducciones Legales I - Aportes Jubilatorios</h2>
+      <p>El sistema jubilatorio argentino se sustenta en el principio de reparto, en el que los aportes de los trabajadores y empleadores financian las pensiones actuales. Este mecanismo, regulado tanto por normas nacionales como por resoluciones de la ANSES, requiere de un análisis profundo para entender su impacto en la economía individual y colectiva.</p>
+      <h3>Conceptos y Cálculos Fundamentales</h3>
+      <ul>
+        <li><strong>Aporte del trabajador:</strong> Generalmente equivale al 11% del salario bruto y se destina a la ANSES para constituir el fondo que financia las futuras jubilaciones. Este porcentaje puede variar en regímenes especiales y es clave para evaluar la evolución del ahorro previsional.</li>
+        <li><strong>Contribución del empleador:</strong> Este aporte, que puede oscilar entre el 17% y el 23%, depende del sector y del convenio colectivo. Se analiza en términos de su efecto multiplicador sobre el financiamiento del sistema y la carga que representa para la empresa.</li>
+        <li><strong>Jubilación mínima y Moratorias Previsionales:</strong> La jubilación mínima, definida por el Estado, garantiza una red de protección social. Asimismo, las moratorias previsionales ofrecen la posibilidad de regularizar aportes en casos de interrupción, permitiendo a ciertos trabajadores acceder a una pensión digna pese a históricos desfases en sus aportes.</li>
+      </ul>
+      <h3>Impacto del Sistema y Perspectivas de Reforma</h3>
+      <p>El equilibrio del sistema previsional depende del número de aportantes, la demografía y las políticas económicas vigentes. Se deben considerar los efectos de la esperanza de vida, la movilidad en la fuerza laboral y la necesidad de ajustes periódicos para mantener la sostenibilidad del sistema. Las reformas previsionales son un tema de debate constante, en las cuales se evalúa la posibilidad de modificar porcentajes y edades de jubilación para garantizar un sistema justo y viable a largo plazo.</p>
+
+      <div class="note"><i class="fas fa-lightbulb"></i> Estos aportes son esenciales para el sostenimiento del sistema de pensiones y para la protección del trabajador en su retiro.</div>
+      <div class="study-info">
+        <h3>Material de Estudio</h3>
+        <p>Consulta documentos oficiales y análisis económicos sobre el sistema previsional argentino. Revisa artículos y libros especializados en derecho laboral y economía para entender la evolución de los aportes jubilatorios y las discusiones sobre posibles reformas.</p>
+      </div>
+      <div class="quiz-section" id="quizModule4">
+        <div class="quiz-question">
+          <label for="m4q1">1. ¿Aproximadamente qué porcentaje se descuenta en aportes jubilatorios al empleado?</label>
+          <select id="m4q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">5%</option>
+            <option value="b">11%</option>
+            <option value="c">20%</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m4q2">2. ¿Por qué son importantes los aportes jubilatorios?</label>
+          <select id="m4q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Porque financian el sistema de pensiones y protegen al trabajador.</option>
+            <option value="b">Porque reducen el salario neto sin aportar beneficios.</option>
+            <option value="c">Porque no tienen impacto en la jubilación.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule4()">Enviar Evaluación</button>
+        <div id="resultModule4" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 5: Deducciones Legales II - Obra Social y PAMI -->
+    <section id="module5" class="module locked">
+
+        <h2><i class="fas fa-play-circle"></i> Módulo 5: Deducciones Legales II - Obra Social y PAMI</h2>
+        <p>La protección sanitaria en Argentina se organiza en dos pilares: las obras sociales, que cubren a los trabajadores activos, y el PAMI, que asume la cobertura médica de los jubilados y pensionados. La integración y el financiamiento de estos sistemas están regulados por normativas específicas y son fundamentales para el bienestar social.</p>
+        <h3>Funcionamiento y Estructura del Sistema de Salud</h3>
+        <ul>
+          <li><strong>Aporte a obra social:</strong> El trabajador destina aproximadamente el 3% de su salario bruto a la obra social de su elección, mientras que el empleador complementa con un aporte que ronda el 6%. Este mecanismo permite la financiación de prestaciones médicas integrales, que abarcan consultas, tratamientos, internaciones y medicamentos.</li>
+          <li><strong>PAMI:</strong> Dirigido a jubilados y pensionados, el PAMI se financia mediante un descuento adicional del 3% sobre la remuneración, garantizando cobertura para un amplio espectro de servicios médicos. Su funcionamiento es clave en un contexto de envejecimiento poblacional y en la protección de los derechos de los adultos mayores.</li>
+          <li><strong>Cobertura y Opciones:</strong> Los trabajadores pueden, en algunos casos, elegir cambiar de obra social según convenios sindicales y opciones de mercado. La calidad de la atención puede variar considerablemente y es objeto de análisis comparativo en estudios sectoriales y evaluaciones de la eficiencia en la gestión de la salud.</li>
+        </ul>
+        <h3>Análisis Crítico y Perspectivas Futuras</h3>
+        <p>Es vital comprender la relación entre los aportes y la calidad de la cobertura médica. El análisis de la estructura de financiamiento revela la importancia de mantener un equilibrio entre el aporte obligatorio y las necesidades sanitarias de la población. Además, la evolución tecnológica –como la digitalización de historias clínicas y el uso de inteligencia artificial en la asignación de recursos– está transformando la manera en que se gestionan y mejoran estos servicios.</p>
+
+      <div class="note"><i class="fas fa-info"></i> Estos descuentos garantizan la atención médica y son esenciales para la seguridad social del trabajador.</div>
+      <div class="study-info">
+        <h3>Material de Estudio</h3>
+        <p>Consulta comparativas entre distintos regímenes de obra social y PAMI. Revisa análisis y estudios sobre la calidad de la atención médica, y cómo estos descuentos influyen en la economía familiar. Se recomienda investigar en fuentes oficiales y revistas especializadas.</p>
+      </div>
+      <div class="quiz-section" id="quizModule5">
+        <div class="quiz-question">
+          <label for="m5q1">1. ¿Cuál es el porcentaje aproximado para la obra social?</label>
+          <select id="m5q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">3%</option>
+            <option value="b">5%</option>
+            <option value="c">10%</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m5q2">2. ¿Qué servicio se financia con estos descuentos?</label>
+          <select id="m5q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">La atención médica y la seguridad del trabajador.</option>
+            <option value="b">Beneficios fiscales.</option>
+            <option value="c">Capacitaciones laborales.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule5()">Enviar Evaluación</button>
+        <div id="resultModule5" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 6: Normativas y Leyes (Ley 20.744) -->
+    <section id="module6" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 6: Normativas y Leyes (Ley 20.744)</h2>
+      <p>La Ley 20.744 de Contrato de Trabajo es la piedra angular que regula las relaciones laborales en Argentina, estableciendo un marco normativo que protege los derechos y define las obligaciones de empleadores y trabajadores. Su interpretación y aplicación son esenciales para la correcta liquidación de sueldos y el mantenimiento de un equilibrio en el mercado laboral.</p>
+      <h3>Aspectos Normativos y Contenidos Esenciales</h3>
+      <ul>
+        <li><strong>Derechos y Obligaciones:</strong> La ley garantiza condiciones laborales dignas, la estabilidad en el empleo y el pago puntual de salarios. Incluye disposiciones sobre igualdad de oportunidades, protección ante despidos injustificados y la obligación de emitir recibos de sueldo conforme a los requisitos legales.</li>
+        <li><strong>Jornada Laboral y Descansos:</strong> Se establece un límite de 8 horas diarias o 48 semanales, salvo excepciones reguladas por convenios o normativas específicas. Además, se definen los períodos de descanso, licencias por enfermedad, maternidad, vacaciones y otros permisos especiales.</li>
+        <li><strong>Indemnizaciones y Preaviso:</strong> La ley fija las bases para calcular las indemnizaciones en casos de despido sin causa y determina la obligación de otorgar un preaviso, protegiendo al trabajador ante despidos abruptos.</li>
+        <li><strong>Interpretación Jurisprudencial:</strong> La aplicación de la Ley 20.744 ha sido objeto de numerosos fallos judiciales, los cuales han ido precisando y ampliando su alcance, configurando una doctrina que se adapta a las necesidades cambiantes del mundo laboral.</li>
+      </ul>
+      <h3>Implicaciones para la Gestión Empresarial y la Protección del Trabajador</h3>
+      <p>El cumplimiento riguroso de la Ley 20.744 es fundamental para evitar sanciones legales y conflictos laborales. Tanto empleadores como empleados deben estar actualizados respecto a las modificaciones y jurisprudencia emergente, lo que contribuye a la construcción de un ambiente laboral justo y transparente. Además, el análisis de casos prácticos y la revisión de modelos de recibos de sueldo permiten identificar oportunidades de mejora en la gestión de recursos humanos y la optimización de procesos administrativos.</p>
+
+      <div class="note"><i class="fas fa-info-circle"></i> Conocer esta ley es crucial para interpretar correctamente los descuentos y aportes en la nómina.</div>
+      <div class="study-info">
+        <h3>Material de Estudio</h3>
+        <p>Lee el texto completo de la Ley 20.744, consulta análisis de expertos y debates sobre reformas laborales. Recursos como páginas oficiales del Ministerio de Trabajo y artículos académicos te ayudarán a profundizar en la aplicación de esta normativa.</p>
+      </div>
+      <div class="quiz-section" id="quizModule6">
+        <div class="quiz-question">
+          <label for="m6q1">1. ¿Cuál ley es la principal que regula las relaciones laborales en Argentina?</label>
+          <select id="m6q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Ley de Riesgos del Trabajo</option>
+            <option value="b">Ley 20.744</option>
+            <option value="c">Normativas de la AFIP</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m6q2">2. ¿Qué aspecto NO regula la Ley 20.744?</label>
+          <select id="m6q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">La jornada laboral.</option>
+            <option value="b">Los descansos obligatorios.</option>
+            <option value="c">El monto de bonificaciones extrasalariales.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule6()">Enviar Evaluación</button>
+        <div id="resultModule6" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 7: Cálculo del Salario Neto -->
+    <section id="module7" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 7: Cálculo del Salario Neto</h2>
+      <p>Este módulo se enfoca en el proceso analítico para transformar el salario bruto en el salario neto. Se abordan los fundamentos matemáticos y normativos, así como las variables que influyen en el resultado final.</p>
+      
+      <h3>Conceptos Fundamentales y Variables Críticas</h3>
+      <ul>
+        <li><strong>Salario Bruto:</strong> Total de remuneraciones antes de aplicar descuentos.</li>
+        <li><strong>Deducciones Obligatorias:</strong> Incluyen aportes jubilatorios, obra social, PAMI y retenciones fiscales.</li>
+        <li><strong>Factores de Ajuste:</strong> Redondeos, bonificaciones, descuentos no obligatorios y ajustes por convenios colectivos.</li>
+      </ul>
+      <p><strong>Fórmula Básica:</strong> <em>Salario Neto = Salario Bruto - (Salario Bruto x % de deducciones)</em></p>
+      
+      <h3>Análisis y Ejemplos Prácticos</h3>
+      <p>Considera el siguiente caso: Un trabajador con un salario bruto de $120,000 y un total de deducciones del 25% se procesaría de la siguiente manera:</p>
+      <p><em>Salario Neto = $120,000 - ($120,000 x 0.25) = $90,000</em></p>
+      <p>Además, se explican escenarios donde se varían porcentajes en función de cambios en la normativa o condiciones particulares de cada empresa.</p>
+      
+      <h3>Aplicación Profesional y Relevancia</h3>
+      <p>Comprender estos cálculos no solo es vital para la correcta liquidación de sueldos, sino también para realizar auditorías internas, asesorar a equipos de recursos humanos y garantizar el cumplimiento normativo. Esta base teórica se complementa con ejercicios prácticos que simulan situaciones reales.</p>
+      
+      <div class="note"><i class="fas fa-lightbulb"></i> Pequeños cambios en los porcentajes de deducción pueden generar diferencias significativas en el sueldo neto, por lo que es esencial dominar estos conceptos.</div>
+      <div class="study-info">
+        <h3>Recursos de Aprendizaje</h3>
+        <p>Consulta manuales de contabilidad, simuladores en línea y cursos especializados en finanzas laborales para profundizar en el análisis de nóminas.</p>
+      </div>
+      <div class="quiz-section" id="quizModule7">
+        <div class="quiz-question">
+          <label for="m7q1">1. ¿Cuál es la fórmula básica para calcular el salario neto?</label>
+          <select id="m7q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Salario Bruto + Deducciones</option>
+            <option value="b">Salario Bruto - (Salario Bruto x % de deducciones)</option>
+            <option value="c">Salario Bruto / Deducciones</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m7q2">2. Si un trabajador tiene un salario bruto de $120,000 y se aplican deducciones del 25%, ¿cuál será su salario neto?</label>
+          <select id="m7q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">$90,000</option>
+            <option value="b">$95,000</option>
+            <option value="c">$90,000</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule7()">Enviar Evaluación</button>
+        <div id="resultModule7" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 8: Calculadora Básica -->
+    <section id="module8" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 8: Calculadora Básica</h2>
+      <p>Esta herramienta interactiva está diseñada para que el usuario realice cálculos rápidos del salario neto. La interfaz simplificada facilita la comprobación de cálculos manuales y el análisis de cómo varían los resultados ante distintos porcentajes de deducción.</p>
+      
+      <h3>Características y Funcionamiento</h3>
+      <ul>
+        <li><strong>Ingreso de Datos:</strong> Permite introducir el salario bruto y el porcentaje global de deducción.</li>
+        <li><strong>Retroalimentación Instantánea:</strong> Muestra el resultado del salario neto y recalcula en tiempo real ante cambios en los valores.</li>
+        <li><strong>Uso Didáctico:</strong> Ideal para practicar y comparar escenarios sencillos.</li>
+      </ul>
+      
+      <div id="calculadora">
+        <label for="basicGrossSalary">Salario Bruto ($):</label>
+        <input type="number" id="basicGrossSalary" placeholder="Ingrese el salario bruto">
+        <label for="basicDeduction">Porcentaje de Deducción (%):</label>
+        <input type="number" id="basicDeduction" placeholder="Ej: 20" min="0" max="100">
+        <button type="button" onclick="calculateBasic()">Calcular Salario Neto</button>
+        <div id="basicResult" class="result"></div>
+      </div>
+      
+      <h3>Consejos para el Uso Efectivo</h3>
+      <p>Verifica que los datos ingresados correspondan a las deducciones actuales de la normativa laboral. Experimenta con distintos porcentajes para comprender el impacto de cada variable.</p>
+      
+      <div class="note"><i class="fas fa-calculator"></i> La calculadora básica es una excelente herramienta para familiarizarse con el concepto de deducciones globales.</div>
+      <div class="study-info">
+        <h3>Material Complementario</h3>
+        <p>Explora tutoriales en video y guías prácticas sobre el uso de herramientas financieras básicas para potenciar tu aprendizaje.</p>
+      </div>
+
+      <div class="quiz-section" id="quizModule8">
+        <div class="quiz-question">
+          <label for="m8q1">1. ¿Qué dato es esencial para la calculadora básica?</label>
+          <select id="m8q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El salario neto</option>
+            <option value="b">El salario bruto</option>
+            <option value="c">El monto de las bonificaciones</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m8q2">2. ¿Qué resultado se espera al aplicar un 20% de deducción sobre $100,000?</label>
+          <select id="m8q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">$80,000</option>
+            <option value="b">$85,000</option>
+            <option value="c">$90,000</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule8()">Enviar Evaluación</button>
+        <div id="resultModule8" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 9: Calculadora Avanzada -->
+    <section id="module9" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 9: Calculadora Avanzada</h2>
+      <p>La calculadora avanzada está pensada para usuarios que requieran un análisis detallado y personalizado. Permite ingresar porcentajes individuales para cada deducción, lo que favorece la simulación de escenarios complejos.</p>
+      
+      <h3>Características Detalladas</h3>
+      <ul>
+        <li><strong>Desglose Individual:</strong> Permite ingresar porcentajes separados para aportes jubilatorios, obra social y PAMI.</li>
+        <li><strong>Análisis Comparativo:</strong> Visualiza el efecto acumulativo y el impacto individual de cada deducción.</li>
+        <li><strong>Simulación de Escenarios:</strong> Facilita la comparación de diferentes combinaciones de deducciones para ajustar la estrategia de liquidación.</li>
+      </ul>
+      
+      <div id="calculadoraAvanzada">
+        <label for="advancedGrossSalary">Salario Bruto ($):</label>
+        <input type="number" id="advancedGrossSalary" placeholder="Ingrese el salario bruto">
+        <label for="deductionJubilatorio">Aportes Jubilatorios (%):</label>
+        <input type="number" id="deductionJubilatorio" placeholder="Ej: 11" min="0" max="100">
+        <label for="deductionObraSocial">Obra Social (%):</label>
+        <input type="number" id="deductionObraSocial" placeholder="Ej: 3" min="0" max="100">
+        <label for="deductionPAMI">PAMI (%):</label>
+        <input type="number" id="deductionPAMI" placeholder="Ej: 3" min="0" max="100">
+        <button type="button" onclick="calculateAdvanced()">Calcular Salario Neto Avanzado</button>
+        <div id="advancedResult" class="result"></div>
+      </div>
+      
+      <h3>Aplicación Profesional</h3>
+      <p>Esta herramienta es esencial para quienes trabajan en áreas de finanzas y recursos humanos, ya que permite ajustar y prever el impacto de cambios en la legislación o en las políticas internas de la empresa.</p>
+      
+      <div class="note"><i class="fas fa-calculator"></i> Utiliza la calculadora avanzada para realizar análisis comparativos y optimizar la estructura de deducciones en escenarios reales.</div>
+      <div class="study-info">
+        <h3>Recomendaciones de Estudio</h3>
+        <p>Revisa estudios de caso y participa en foros especializados donde se discutan estrategias para la optimización del cálculo salarial y la administración de nóminas.</p>
+      </div>
+      <div class="quiz-section" id="quizModule9">
+        <div class="quiz-question">
+          <label for="m9q1">1. ¿Cuál es la principal diferencia entre la calculadora básica y la avanzada?</label>
+          <select id="m9q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">La avanzada permite ingresar porcentajes para cada deducción.</option>
+            <option value="b">La básica solo muestra el salario bruto.</option>
+            <option value="c">No hay diferencia.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m9q2">2. ¿Qué sucede si se incrementa el porcentaje de obra social?</label>
+          <select id="m9q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El salario neto aumenta.</option>
+            <option value="b">El salario neto disminuye.</option>
+            <option value="c">No se modifica el salario neto.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule9()">Enviar Evaluación</button>
+        <div id="resultModule9" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 10: Ejemplo Real de Recibo de Sueldo -->
+    <section id="module10" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 10: Ejemplo Real de Recibo de Sueldo</h2>
+      <p>Este módulo presenta un recibo de sueldo real con el fin de identificar y analizar cada rubro. Se detallan tanto las percepciones como las deducciones, permitiendo al usuario comprender cómo se refleja cada componente en el documento oficial.</p>
+      
+      <h3>Análisis Detallado del Recibo</h3>
+      <ul>
+        <li><strong>Datos del Empleado:</strong> Incluyen información personal y laboral que garantizan la identificación y autenticidad del recibo.</li>
+        <li><strong>Percepciones:</strong> Se desglosan el salario base, bonificaciones, incentivos y otros conceptos remunerativos.</li>
+        <li><strong>Deducciones:</strong> Se especifican los descuentos obligatorios, donde se detallan aportes jubilatorios, obra social, PAMI y otros descuentos fiscales.</li>
+        <li><strong>Líquido a Recibir:</strong> Resultado final obtenido después de restar todas las deducciones al total de percepciones.</li>
+      </ul>
+      
+      <div class="payslip">
+        <table>
+          <tr>
+            <th colspan="2"><i class="fas fa-file-alt"></i> Recibo de Sueldo</th>
+          </tr>
+          <tr>
+            <td><strong>Empleado:</strong></td>
+            <td>María González</td>
+          </tr>
+          <tr>
+            <td><strong>CUIL:</strong></td>
+            <td>27-87654321-0</td>
+          </tr>
+          <tr>
+            <td><strong>Fecha:</strong></td>
+            <td>15/03/2025</td>
+          </tr>
+          <tr>
+            <th colspan="2">Percepciones</th>
+          </tr>
+          <tr>
+            <td><strong>Salario Bruto:</strong></td>
+            <td>$ <span id="ps_bruto">120,000</span></td>
+          </tr>
+          <tr>
+            <td><strong>Bonificaciones:</strong></td>
+            <td>$ <span id="ps_bono">8,000</span></td>
+          </tr>
+          <tr>
+            <th colspan="2">Deducciones</th>
+          </tr>
+          <tr>
+            <td><strong>Aportes Jubilatorios:</strong></td>
+            <td>$ <span id="ps_jubilatorios">--</span></td>
+          </tr>
+          <tr>
+            <td><strong>Obra Social:</strong></td>
+            <td>$ <span id="ps_os">--</span></td>
+          </tr>
+          <tr>
+            <td><strong>PAMI:</strong></td>
+            <td>$ <span id="ps_pami">--</span></td>
+          </tr>
+          <tr>
+            <th><strong>Líquido a Recibir:</strong></th>
+            <th>$ <span id="ps_neto">--</span></th>
+          </tr>
+        </table>
+      </div>
+      
+      <h3>Aspectos Críticos para el Profesional</h3>
+      <p>El análisis minucioso de cada sección del recibo es fundamental para detectar errores, optimizar cálculos y garantizar el cumplimiento de las normativas vigentes. Este ejercicio prepara al profesional para tareas de auditoría y gestión contable en el ámbito laboral.</p>
+      
+      <div class="note"><i class="fas fa-info-circle"></i> La correcta interpretación de un recibo de sueldo es clave para la transparencia y el control en la administración de recursos humanos.</div>
+      <div class="study-info">
+        <h3>Material de Referencia</h3>
+        <p>Investiga casos reales, consulta documentos oficiales y revisa tutoriales sobre la confección y análisis de recibos de sueldo para fortalecer tu capacidad de evaluación crítica.</p>
+      </div>
+      <div class="quiz-section" id="quizModule10">
+        <div class="quiz-question">
+          <label for="m10q1">1. ¿Qué elemento NO aparece en el recibo mostrado?</label>
+          <select id="m10q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Datos del empleado.</option>
+            <option value="b">Percepciones y deducciones.</option>
+            <option value="c">Información de impuestos municipales.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m10q2">2. ¿Por qué es importante conocer cada rubro del recibo?</label>
+          <select id="m10q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Para detectar errores y mejorar la transparencia.</option>
+            <option value="b">Solo es útil para el departamento de recursos humanos.</option>
+            <option value="c">No es relevante conocerlo.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule10()">Enviar Evaluación</button>
+        <div id="resultModule10" class="result"></div>
+      </div>
+    </section>
+    
+<!-- MÓDULO 11: Actividad Práctica – Completar un Recibo -->
+<section id="module11" class="module locked">
+  <h2><i class="fas fa-play-circle"></i> Módulo 11: Actividad Práctica – Completar un Recibo</h2>
+  <p>Este módulo está diseñado para que el estudiante aplique de forma práctica lo aprendido en los módulos anteriores. La actividad consiste en completar un recibo de sueldo, detectando y corrigiendo inconsistencias, y realizando un análisis comparativo entre el cálculo manual y el automático.</p>
+  
+  <h3>Metodología y Pasos a Seguir</h3>
+  <ol>
+    <li><strong>Revisión:</strong> Analiza detenidamente el recibo de sueldo del Módulo 10.</li>
+    <li><strong>Cálculo Manual:</strong> Determina el porcentaje total de deducción y verifica el resultado del salario neto.</li>
+    <li><strong>Completar el Recibo:</strong> Utiliza el formulario para ingresar el porcentaje calculado y observa la actualización de los montos.</li>
+    <li><strong>Análisis Crítico:</strong> Identifica posibles errores y propone ajustes para optimizar la liquidación.</li>
+  </ol>
+  
+  <div class="note"><i class="fas fa-edit"></i> La práctica constante es esencial para perfeccionar la habilidad de análisis y para desarrollar competencias en la gestión contable y financiera.</div>
+  <form id="payslipForm">
+    <label for="ps_percent">Porcentaje Total de Deducción (%):</label>
+    <input type="number" id="ps_percent" placeholder="Ej: 17" min="0" max="100">
+    <button type="button" onclick="completePayslip()">Completar Recibo de Sueldo</button>
+  </form>
+  <div id="payslipResult" class="result"></div>
+  <button type="button" style="margin-top: 20px;" onclick="unlockModule('module12')">Siguiente</button>
+  <div class="study-info">
+    <h3>Recursos y Ejercicios Adicionales</h3>
+    <p>Realiza simulaciones con diferentes porcentajes y comparte tus resultados en foros profesionales para recibir retroalimentación y mejorar tus habilidades analíticas.</p>
+  </div>
+</section>
+    
+    <!-- MÓDULO 12: Complementos Salariales – SAC (Aguinaldo) -->
+    <section id="module12" class="module-sac locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 12: Complementos Salariales – SAC (Aguinaldo)</h2>
+      <p>El Sueldo Anual Complementario (SAC), o aguinaldo, es un beneficio laboral que se abona en dos cuotas, equivalente al 50% del mejor salario mensual del semestre. Este complemento no solo representa un ingreso adicional, sino que es clave para la estabilidad financiera y el reconocimiento laboral.</p>
+      
+      <h3>Fundamentos y Base Legal</h3>
+      <ul>
+        <li><strong>Normativa Vigente:</strong> Se basa en la legislación laboral que establece el derecho al aguinaldo.</li>
+        <li><strong>Criterio de Cálculo:</strong> Se toma el salario más alto percibido en el semestre y se divide en dos cuotas iguales.</li>
+        <li><strong>Impacto en la Economía Familiar:</strong> El SAC actúa como un amortiguador financiero en épocas de alta demanda o imprevistos.</li>
+      </ul>
+      
+      <h3>Ejemplo Ampliado y Consideraciones Prácticas</h3>
+      <p>Por ejemplo, si el mejor salario mensual en el semestre es de $100,000, cada cuota del SAC será de $50,000. Adicionalmente, algunas empresas pueden incluir bonificaciones o ajustar el cálculo en función de beneficios particulares o convenios colectivos.</p>
+      <p>Este módulo profundiza en la importancia del aguinaldo como parte de la compensación global del trabajador y cómo su correcto cálculo repercute en la motivación y el bienestar del personal.</p>
+      
+      <h3>Aplicaciones y Relevancia Profesional</h3>
+      <p>El dominio del cálculo del SAC es fundamental para profesionales de recursos humanos, contadores y asesores laborales. Permite no solo cumplir con la normativa, sino también optimizar la estructura salarial y anticipar variaciones en la economía laboral.</p>
+      
+      <div class="note"><i class="fas fa-info-circle"></i> El conocimiento profundo del SAC permite a los profesionales identificar oportunidades de mejora y asesorar correctamente a empresas y trabajadores.</div>
+      <div class="study-info">
+        <h3>Recursos de Profundización</h3>
+        <p>Consulta la legislación actual, analiza estudios comparativos y participa en seminarios especializados en compensación y beneficios laborales para expandir tus conocimientos sobre este importante complemento salarial.</p>
+      </div>
+      <div class="quiz-section" id="quizModule12">
+        <div class="quiz-question">
+          <label for="m12q1">1. ¿Cómo se calcula el SAC?</label>
+          <select id="m12q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El 50% del salario bruto anual.</option>
+            <option value="b">El 50% del mejor salario mensual del semestre.</option>
+            <option value="c">El 100% del salario mensual.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m12q2">2. ¿Por qué es importante el SAC en la economía del trabajador?</label>
+          <select id="m12q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Porque representa un ingreso adicional significativo.</option>
+            <option value="b">Porque reduce el salario neto.</option>
+            <option value="c">No es importante.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule12()">Enviar Evaluación</button>
+        <div id="resultModule12" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 13: Complementos Salariales – Vacaciones -->
+    <section id="module13" class="module-vacaciones locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 13: Complementos Salariales – Vacaciones</h2>
+      <p>Las vacaciones constituyen un derecho esencial de los trabajadores, regulado por la Ley de Contrato de Trabajo. Este módulo profundiza en el cálculo, la base legal y la importancia del período vacacional tanto para el empleado como para la empresa.</p>
+      
+      <h3>Cálculo del Pago Vacacional</h3>
+      <p>El cálculo del pago de vacaciones se realiza en función del salario habitual y la antigüedad del trabajador:</p>
+      <ul>
+        <li><strong>Días de Vacaciones:</strong> Según la antigüedad (por ejemplo, 14 días para menos de 5 años, 21 días para entre 5 y 10 años, etc.).</li>
+        <li><strong>Base de Cálculo:</strong> Se toma el salario mensual o diario y se determina el valor proporcional para el período vacacional. Además, en muchos casos se abona un <em>plus vacacional</em> que puede ser un porcentaje adicional sobre el salario.</li>
+      </ul>
+      <p>Por ejemplo, un trabajador con 4 años de servicio que percibe $100.000 mensuales y tiene 14 días de vacaciones, recibirá una remuneración proporcional más un eventual adicional, acorde a lo establecido en la normativa vigente.</p>
+      
+      <h3>Aspectos Legales y Relevancia Profesional</h3>
+      <p>Conocer la correcta liquidación del pago vacacional es vital para:</p>
+      <ul>
+        <li>Asegurar el cumplimiento de la normativa laboral.</li>
+        <li>Prevenir conflictos y sanciones durante auditorías de AFIP o inspecciones laborales.</li>
+        <li>Optimizar la gestión de recursos humanos mediante el uso de software especializado.</li>
+      </ul>
+      <div class="note">
+        <i class="fas fa-lightbulb"></i> Profundizar en el tema permite detectar discrepancias y mejorar la transparencia en la liquidación.
+      </div>
+      <div class="quiz-section" id="quizModule13">
+        <div class="quiz-question">
+          <label for="m13q1">1. ¿Qué factor determina el pago adicional por vacaciones?</label>
+          <select id="m13q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">La antigüedad del trabajador.</option>
+            <option value="b">El salario bruto.</option>
+            <option value="c">La cantidad de horas extras.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m13q2">2. ¿Cuál es la finalidad principal del pago extra por vacaciones?</label>
+          <select id="m13q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Compensar la pérdida de ingresos.</option>
+            <option value="b">Reconocer la antigüedad y fomentar el descanso.</option>
+            <option value="c">Incrementar los beneficios fiscales.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule13()">Enviar Evaluación</button>
+        <div id="resultModule13" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 14: Complementos Salariales – Horas Extras -->
+    <section id="module14" class="module-horas locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 14: Complementos Salariales – Horas Extras</h2>
+  <p>Este módulo explora el concepto de horas extras, su cálculo y la relevancia de su correcta aplicación en la liquidación de sueldos. Se abordan tanto los casos generales como las particularidades que pueden surgir en situaciones especiales.</p>
+  
+  <h3>Cálculo y Porcentajes Aplicables</h3>
+  <p>En Argentina, la legislación establece que:</p>
+  <ul>
+    <li>Las horas extraordinarias deben pagarse con un recargo mínimo del 50% sobre la tarifa habitual para días hábiles.</li>
+    <li>Para horas extras en días feriados o domingos, el recargo puede llegar al 100%.</li>
+    <li>El cálculo se realiza en función del salario bruto y las horas trabajadas en exceso de la jornada normal.</li>
+  </ul>
+  <p>Por ejemplo, si un trabajador tiene un salario de $20 por hora y realiza 5 horas extra en un día hábil, se le abonará $30 por cada hora extra (20 + 50%).</p>
+  
+  <h3>Aspectos Normativos y Control</h3>
+  <p>La correcta aplicación del pago de horas extras es esencial para:</p>
+  <ul>
+    <li>Garantizar el cumplimiento de la Ley de Contrato de Trabajo y las directrices de AFIP.</li>
+    <li>Prevenir conflictos laborales y sanciones legales.</li>
+    <li>Facilitar la auditoría interna y externa mediante registros precisos de la jornada laboral.</li>
+  </ul>
+  <div class="note">
+    <i class="fas fa-info-circle"></i> La digitalización de los registros y el uso de herramientas de control horario son aliados fundamentales para profesionales de RRHH.
+  </div>
+        <div class="quiz-question">
+          <label for="m14q2">2. ¿Qué debe garantizarse al pagar horas extras?</label>
+          <select id="m14q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Que el recargo cumpla con la ley y el convenio.</option>
+            <option value="b">Que se pague el mismo monto que la hora normal.</option>
+            <option value="c">Que se descuente del salario base.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule14()">Enviar Evaluación</button>
+        <div id="resultModule14" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 15: Casos Especiales y Regímenes Diferenciados -->
+    <section id="module15" class="module-special locked">
+
+  <h2><i class="fas fa-play-circle"></i> Módulo 15: Casos Especiales</h2>
+  <p>En este módulo se abordan situaciones particulares que pueden afectar la liquidación de sueldos, tales como licencias por enfermedad, maternidad, despidos, y otros escenarios que requieren un tratamiento especial.</p>
+  
+  <h3>Escenarios y Tratamientos Diferenciados</h3>
+  <ul>
+    <li><strong>Licencias y Ausencias:</strong> Cómo se liquidan los períodos de inasistencia por enfermedad o accidente, considerando la normativa y los convenios colectivos.</li>
+    <li><strong>Maternidad y Paternidad:</strong> Aspectos especiales en el cálculo de la remuneración durante licencias parentales, garantizando el acceso a beneficios sociales.</li>
+    <li><strong>Despidos y Preaviso:</strong> El impacto de las indemnizaciones y la liquidación en casos de despido sin causa, y cómo se calculan en función del tiempo trabajado y otros factores.</li>
+    <li><strong>Trabajos Irregulares:</strong> Particularidades en regímenes de teletrabajo o en industrias con jornadas no convencionales.</li>
+  </ul>
+  
+  <h3>Importancia de la Adaptabilidad</h3>
+  <p>El conocimiento detallado de estos casos especiales permite al profesional anticipar posibles controversias y asesorar tanto a empleadores como a empleados de manera precisa y actualizada.</p>
+
+      <div class="quiz-section" id="quizModule15">
+        <div class="quiz-question">
+          <label for="m15q1">1. ¿Qué factor puede generar diferencias en la liquidación?</label>
+          <select id="m15q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">El convenio colectivo.</option>
+            <option value="b">La ubicación geográfica.</option>
+            <option value="c">La edad del trabajador.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m15q2">2. ¿Por qué es relevante conocer los casos especiales?</label>
+          <select id="m15q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Porque afectan directamente la liquidación final.</option>
+            <option value="b">Porque son irrelevantes para el cálculo.</option>
+            <option value="c">Porque solo interesan a la gerencia.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule15()">Enviar Evaluación</button>
+        <div id="resultModule15" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 16: Preguntas Frecuentes (FAQ) -->
+    <section id="module16" class="module locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 16: Preguntas Frecuentes (FAQ)</h2>
+      <p>Consulta respuestas detalladas a las dudas más comunes sobre la liquidación de sueldos. Esta sección te ayudará a repasar y consolidar los conceptos clave y a resolver inquietudes surgidas durante el curso.</p>
+      <div class="faq">
+        <h3><i class="fas fa-question-circle"></i> Preguntas Frecuentes</h3>
+        <div class="faq-item">¿Qué diferencia hay entre salario bruto y neto?
+          <div class="faq-answer">El salario bruto es el total antes de aplicar descuentos; el salario neto es el monto que recibe el trabajador tras restar todas las deducciones.</div>
+        </div>
+        <div class="faq-item">¿Cuáles son las deducciones obligatorias?
+          <div class="faq-answer">Generalmente se incluyen aportes jubilatorios, obra social, PAMI y otros descuentos establecidos por el convenio colectivo.</div>
+        </div>
+        <div class="faq-item">¿Pueden variar los porcentajes de deducción?
+          <div class="faq-answer">Sí, estos porcentajes pueden variar según la normativa vigente y el convenio aplicable en cada sector.</div>
+        </div>
+      </div>
+      <div class="note"><i class="fas fa-info"></i> Las FAQ son una herramienta fundamental para reforzar el aprendizaje y resolver dudas de forma rápida.</div>
+      <div class="study-info">
+        <h3>Material de Estudio</h3>
+        <p>Consulta fuentes oficiales, participa en foros de discusión y revisa videos explicativos sobre temas salariales. La interacción con otros estudiantes y expertos te ayudará a ampliar y consolidar tus conocimientos.</p>
+      </div>
+      <div class="quiz-section" id="quizModule16">
+        <div class="quiz-question">
+          <label for="m16q1">1. ¿Qué es una FAQ?</label>
+          <select id="m16q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Una sección de preguntas frecuentes.</option>
+            <option value="b">Un tipo de cálculo salarial.</option>
+            <option value="c">Un descuento obligatorio.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m16q2">2. ¿Cuál es el propósito principal de una sección FAQ?</label>
+          <select id="m16q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Reforzar y aclarar los conceptos clave.</option>
+            <option value="b">Añadir contenido irrelevante.</option>
+            <option value="c">Sustituir el material de estudio.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule16()">Enviar Evaluación</button>
+        <div id="resultModule16" class="result"></div>
+      </div>
+    </section>
+    
+    <!-- MÓDULO 17: Examen Final y Certificación -->
+    <section id="module17" class="module-exam locked">
+       <!-- Barra de Progreso -->
+      <h2><i class="fas fa-play-circle"></i> Módulo 17: Examen Final y Certificación</h2>
+      <p>Resuelve este examen global que abarca todos los temas vistos en el curso. Revisa cada pregunta con detenimiento, repasa el material de estudio y asegúrate de comprender cada concepto antes de enviar tus respuestas.</p>
+      <div class="quiz-section" id="quizFinal">
+        <!-- Modal de Instrucciones -->
+<div id="instructionsModal" class="modal">
+  <div class="modal-content animate__animated animate__fadeInDown">
+    <h2><i class="fas fa-info-circle"></i> Instrucciones del Examen</h2>
+    <p>Bienvenido al Módulo 17: Examen Final Interactivo. Tendrás 45 minutos para completar 20 actividades. Se te dará feedback inmediato y, al finalizar, se mostrará tu puntaje. Debes alcanzar al menos un 80% para aprobar.</p>
+    <button onclick="startExam()" class="btn-start"><i class="fas fa-play"></i> Iniciar Examen</button>
+  </div>
+</div>
+  <div id="progressBarContainer" style="margin-bottom:10px;">
+    <progress id="progressBar" value="0" max="20" style="width:100%; height:20px;"></progress>
+    <span id="progressText" style="font-weight:bold;">0/20 actividades completadas</span>
+  </div>
+  <!-- Temporizador -->
+  <div id="timer" class="animate__animated animate__pulse" style="font-size:1.2rem; font-weight:bold; margin-bottom:15px;">
+    <i class="fas fa-hourglass-half"></i> Tiempo restante: <span id="timeDisplay">45:00</span>
+  </div>
+
+  <!-- Actividad 1: Caso Real de Liquidación -->
+  <div class="activity animate__animated animate__zoomIn" id="activity1">
+    <h3><i class="fas fa-briefcase"></i> Actividad 1: Caso Real de Liquidación</h3>
+    <p>
+      <strong>Empresa:</strong> ABC S.A.<br>
+      <strong>Empleado:</strong> Luis Martínez<br>
+      <strong>Salario Bruto:</strong> $200,000<br>
+      <strong>Deducciones:</strong> Jubilación 11%, Obra Social 3%, PAMI 3%<br>
+      <span style="font-size:1.2rem;">💡 Consejo: Aplica el 17% en total.</span>
+    </p>
+    <label for="netSalary1">Calcule el salario neto:</label>
+    <input type="number" id="netSalary1" placeholder="Ingrese su respuesta" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity1()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback1"></div>
+  </div>
+
+  <!-- Actividad 2: ¿Qué es el salario bruto? -->
+  <div class="activity animate__animated animate__zoomIn" id="activity2">
+    <h3><i class="fas fa-question-circle"></i> Actividad 2: ¿Qué es el salario bruto?</h3>
+    <select id="activity2_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="a">El sueldo después de descuentos</option>
+      <option value="b">El sueldo total antes de descuentos</option>
+      <option value="c">El total de deducciones</option>
+    </select>
+    <button onclick="checkActivity2()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback2"></div>
+  </div>
+
+  <!-- Actividad 3: Deducción legal obligatoria -->
+  <div class="activity animate__animated animate__zoomIn" id="activity3">
+    <h3><i class="fas fa-question-circle"></i> Actividad 3: ¿Cuál de estas es una deducción legal obligatoria?</h3>
+    <select id="activity3_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="a">Bonificaciones</option>
+      <option value="b">Aportes jubilatorios</option>
+      <option value="c">Incentivos</option>
+    </select>
+    <button onclick="checkActivity3()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback3"></div>
+  </div>
+
+  <!-- Actividad 4: Completar la Fórmula del Salario Neto -->
+  <div class="activity animate__animated animate__zoomIn" id="activity4">
+    <h3><i class="fas fa-edit"></i> Actividad 4: Completar la Fórmula del Salario Neto</h3>
+    <p>
+      Complete la siguiente fórmula: <br>
+      <em>Salario Neto = Salario Bruto - (Salario Bruto x <input type="number" id="activity4_input" placeholder="%" style="width:60px;" class="animate__animated animate__fadeInUp">)</em>
+    </p>
+    <button onclick="checkActivity4()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback4"></div>
+  </div>
+
+  <!-- Actividad 5: Verdadero o Falso -->
+  <div class="activity animate__animated animate__zoomIn" id="activity5">
+    <h3><i class="fas fa-check-circle"></i> Actividad 5: Verdadero o Falso</h3>
+    <p>El salario neto es mayor que el salario bruto. 🤔</p>
+    <select id="activity5_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="false">Falso</option>
+      <option value="true">Verdadero</option>
+    </select>
+    <button onclick="checkActivity5()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback5"></div>
+  </div>
+
+  <!-- Actividad 6: Calcular Aporte Jubilatorio -->
+  <div class="activity animate__animated animate__zoomIn" id="activity6">
+    <h3><i class="fas fa-calculator"></i> Actividad 6: Calcular Aporte Jubilatorio</h3>
+    <p>Dado un salario bruto de $150,000 y un aporte del 11%, calcule el monto de aportes jubilatorios.</p>
+    <label for="activity6_input">Monto ($):</label>
+    <input type="number" id="activity6_input" placeholder="Ingrese monto" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity6()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback6"></div>
+  </div>
+
+  <!-- Actividad 7: Calcular Obra Social -->
+  <div class="activity animate__animated animate__zoomIn" id="activity7">
+    <h3><i class="fas fa-calculator"></i> Actividad 7: Calcular Obra Social</h3>
+    <p>Dado un salario bruto de $150,000 y una deducción del 3% para obra social, calcule el monto correspondiente.</p>
+    <label for="activity7_input">Monto ($):</label>
+    <input type="number" id="activity7_input" placeholder="Ingrese monto" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity7()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback7"></div>
+  </div>
+
+  <!-- Actividad 8: Calcular PAMI -->
+  <div class="activity animate__animated animate__zoomIn" id="activity8">
+    <h3><i class="fas fa-calculator"></i> Actividad 8: Calcular PAMI</h3>
+    <p>Dado un salario bruto de $150,000 y una deducción del 3% para PAMI, calcule el monto correspondiente.</p>
+    <label for="activity8_input">Monto ($):</label>
+    <input type="number" id="activity8_input" placeholder="Ingrese monto" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity8()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback8"></div>
+  </div>
+
+  <!-- Actividad 9: Sumar Deducciones -->
+  <div class="activity animate__animated animate__zoomIn" id="activity9">
+    <h3><i class="fas fa-plus-circle"></i> Actividad 9: Calcular Total de Deducciones</h3>
+    <p>Utilizando los montos de las actividades 6, 7 y 8, sume las deducciones totales.</p>
+    <label for="activity9_input">Total Deducciones ($):</label>
+    <input type="number" id="activity9_input" placeholder="Ingrese total" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity9()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback9"></div>
+  </div>
+
+  <!-- Actividad 10: Calcular Salario Neto -->
+  <div class="activity animate__animated animate__zoomIn" id="activity10">
+    <h3><i class="fas fa-calculator"></i> Actividad 10: Calcular Salario Neto</h3>
+    <p>Dado un salario bruto de $150,000 y deducciones totales de 17%, ¿cuál es el salario neto?</p>
+    <label for="activity10_input">Salario Neto ($):</label>
+    <input type="number" id="activity10_input" placeholder="Ingrese respuesta" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity10()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback10"></div>
+  </div>
+
+  <!-- Actividad 11: Emparejar Deducciones con su Porcentaje -->
+  <div class="activity animate__animated animate__zoomIn" id="activity11">
+    <h3><i class="fas fa-list"></i> Actividad 11: Emparejar Deducciones con su Porcentaje</h3>
+    <p>Seleccione el porcentaje correcto para cada deducción:</p>
+    <p>Aportes Jubilatorios: 
+      <select id="activity11_q1" class="animate__animated animate__fadeInUp">
+        <option value="">Seleccione</option>
+        <option value="11">11%</option>
+        <option value="3">3%</option>
+        <option value="5">5%</option>
+      </select>
+    </p>
+    <p>Obra Social: 
+      <select id="activity11_q2" class="animate__animated animate__fadeInUp">
+        <option value="">Seleccione</option>
+        <option value="11">11%</option>
+        <option value="3">3%</option>
+        <option value="5">5%</option>
+      </select>
+    </p>
+    <p>PAMI: 
+      <select id="activity11_q3" class="animate__animated animate__fadeInUp">
+        <option value="">Seleccione</option>
+        <option value="11">11%</option>
+        <option value="3">3%</option>
+        <option value="5">5%</option>
+      </select>
+    </p>
+    <button onclick="checkActivity11()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback11"></div>
+  </div>
+
+  <!-- Actividad 12: Caso Práctico con Diferente Salario -->
+  <div class="activity animate__animated animate__zoomIn" id="activity12">
+    <h3><i class="fas fa-briefcase"></i> Actividad 12: Caso Práctico</h3>
+    <p>Si el salario bruto es de $250,000 y las deducciones totales (jubilación 11%, OS 3%, PAMI 3%) se aplican, ¿cuál es el salario neto?</p>
+    <label for="activity12_input">Salario Neto ($):</label>
+    <input type="number" id="activity12_input" placeholder="Ingrese respuesta" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity12()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback12"></div>
+  </div>
+
+  <!-- Actividad 13: Deducciones no obligatorias -->
+  <div class="activity animate__animated animate__zoomIn" id="activity13">
+    <h3><i class="fas fa-question-circle"></i> Actividad 13: Deducciones no obligatorias</h3>
+    <p>¿Cuál de los siguientes conceptos <strong>NO</strong> es una deducción obligatoria?</p>
+    <select id="activity13_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="a">Bonificaciones</option>
+      <option value="b">Aportes jubilatorios</option>
+      <option value="c">Obra Social</option>
+    </select>
+    <button onclick="checkActivity13()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback13"></div>
+  </div>
+
+  <!-- Actividad 14: Verdadero o Falso sobre Porcentajes -->
+  <div class="activity animate__animated animate__zoomIn" id="activity14">
+    <h3><i class="fas fa-check-circle"></i> Actividad 14: Verdadero o Falso sobre Porcentajes</h3>
+    <p>El aporte jubilatorio corresponde al 11% del salario bruto.</p>
+    <select id="activity14_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="true">Verdadero</option>
+      <option value="false">Falso</option>
+    </select>
+    <button onclick="checkActivity14()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback14"></div>
+  </div>
+
+  <!-- Actividad 15: Calculadora Interactiva -->
+  <div class="activity animate__animated animate__zoomIn" id="activity15">
+    <h3><i class="fas fa-calculator"></i> Actividad 15: Calculadora Interactiva</h3>
+    <p>Ingrese el salario bruto y el porcentaje total de deducciones para calcular el salario neto.</p>
+    <label for="activity15_gross">Salario Bruto ($):</label>
+    <input type="number" id="activity15_gross" placeholder="Ingrese salario" class="animate__animated animate__fadeInUp">
+    <label for="activity15_pct">Porcentaje Total (%):</label>
+    <input type="number" id="activity15_pct" placeholder="Ingrese %" class="animate__animated animate__fadeInUp">
+    <button onclick="calculateInteractive()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-calculator"></i> Calcular</button>
+    <div id="feedback15"></div>
+  </div>
+
+  <!-- Actividad 16: Completar el Recibo de Sueldo -->
+  <div class="activity animate__animated animate__zoomIn" id="activity16">
+    <h3><i class="fas fa-file-alt"></i> Actividad 16: Completar el Recibo de Sueldo</h3>
+    <p>Complete los campos faltantes en este ejemplo de recibo (práctica visual):</p>
+    <label for="activity16_nombre">Nombre del Empleado:</label>
+    <input type="text" id="activity16_nombre" placeholder="Ej: Ana López" class="animate__animated animate__fadeInUp">
+    <label for="activity16_cuil">CUIL:</label>
+    <input type="text" id="activity16_cuil" placeholder="Ej: 27-12345678-9" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity16()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Guardar Datos</button>
+    <div id="feedback16"></div>
+  </div>
+
+  <!-- Actividad 17: Pregunta Abierta -->
+  <div class="activity animate__animated animate__zoomIn" id="activity17">
+    <h3><i class="fas fa-comment"></i> Actividad 17: Define en tus propias palabras</h3>
+    <p>Explique brevemente qué es el salario neto:</p>
+    <textarea id="activity17_text" rows="3" placeholder="Escriba aquí su respuesta..." class="animate__animated animate__fadeInUp"></textarea>
+    <button onclick="checkActivity17()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Enviar Respuesta</button>
+    <div id="feedback17"></div>
+  </div>
+
+  <!-- Actividad 18: Legislación -->
+  <div class="activity animate__animated animate__zoomIn" id="activity18">
+    <h3><i class="fas fa-gavel"></i> Actividad 18: ¿Qué ley regula las relaciones laborales en Argentina?</h3>
+    <select id="activity18_q" class="animate__animated animate__fadeInUp">
+      <option value="">Seleccione una opción</option>
+      <option value="20.744">Ley 20.744</option>
+      <option value="30.000">Ley 30.000</option>
+      <option value="15.000">Ley 15.000</option>
+    </select>
+    <button onclick="checkActivity18()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback18"></div>
+  </div>
+
+  <!-- Actividad 19: Reflexión -->
+  <div class="activity animate__animated animate__zoomIn" id="activity19">
+    <h3><i class="fas fa-brain"></i> Actividad 19: Reflexión</h3>
+    <p>Resuma en pocas líneas cuál es la importancia de conocer y aplicar correctamente los porcentajes de deducción.</p>
+    <textarea id="activity19_text" rows="3" placeholder="Escriba aquí su respuesta..." class="animate__animated animate__fadeInUp"></textarea>
+    <button onclick="checkActivity19()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Enviar Respuesta</button>
+    <div id="feedback19"></div>
+  </div>
+
+  <!-- Actividad 20: Fórmula Resumen -->
+  <div class="activity animate__animated animate__zoomIn" id="activity20">
+    <h3><i class="fas fa-calculator"></i> Actividad 20: Fórmula Resumen</h3>
+    <p>Escriba la fórmula para calcular el salario neto (debe incluir "salario bruto" y "deducciones"):</p>
+    <input type="text" id="activity20_text" placeholder="Escriba la fórmula" class="animate__animated animate__fadeInUp">
+    <button onclick="checkActivity20()" class="btn-verify animate__animated animate__pulse"><i class="fas fa-check"></i> Verificar</button>
+    <div id="feedback20"></div>
+  </div>
+
+  <!-- Botón para finalizar la evaluación y reiniciar -->
+  <div style="margin-top:20px; text-align:center;">
+    <button id="finishTestBtn" onclick="finishTest()" class="animate__animated animate__heartBeat btn-finish" style="padding:15px 25px; font-size:1.1rem;">
+      <i class="fas fa-flag-checkered"></i> Finalizar Evaluación
+    </button>
+    <button id="resetTestBtn" onclick="resetTest()" class="btn-reset" style="padding:10px 20px; font-size:1rem; margin-left:10px; display:none;">
+      <i class="fas fa-redo"></i> Reiniciar Examen
+    </button>
+  </div>
+</div>
+  <!-- Resultados Finales -->
+  <div id="finalResult" style="margin-top:20px; font-size:1.2rem; font-weight:bold;"></div>
+    </section>
+        <!-- MÓDULO 18: Conclusiones y Recursos Adicionales -->
+    <section id="module18" class="module-additional locked">
+      <h2><i class="fas fa-play-circle"></i> Módulo 18: Conclusiones y Recursos Adicionales</h2>
+      <p>Recapitula lo aprendido durante el curso, revisa un resumen de cada módulo y accede a material bibliográfico y recursos en línea para continuar tu formación en el área de liquidación de sueldos. Este módulo te orientará sobre cómo seguir actualizándote y aplicando los conocimientos en tu entorno profesional.</p>
+      <ul>
+        <li><strong>Resumen de Conceptos:</strong> Repaso de los puntos clave de cada módulo.</li>
+        <li><strong>Consejos Prácticos:</strong> Recomendaciones para aplicar lo aprendido en el ámbito laboral.</li>
+        <li><strong>Bibliografía y Recursos:</strong> Enlaces, libros y artículos especializados.</li>
+      </ul>
+      <div class="note"><i class="fas fa-info-circle"></i> La actualización continua es fundamental para mantenerse competitivo en el mercado laboral.</div>
+      <div class="study-info">
+        <h3>Material de Estudio</h3>
+        <p>Explora cursos complementarios, seminarios web, revistas especializadas y recursos en línea sobre recursos humanos, contabilidad y legislación laboral. Investiga sobre innovaciones en la gestión salarial y las mejores prácticas en la administración de nóminas.</p>
+      </div>
+      <div class="quiz-section" id="quizModule18">
+        <div class="quiz-question">
+          <label for="m18q1">1. ¿Por qué es importante actualizarse en temas de liquidación de sueldos?</label>
+          <select id="m18q1">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Para cumplir normativas y mejorar la precisión en los cálculos.</option>
+            <option value="b">No es muy importante.</option>
+            <option value="c">Solo para áreas administrativas.</option>
+          </select>
+        </div>
+        <div class="quiz-question">
+          <label for="m18q2">2. ¿Qué recurso es fundamental para la formación continua en este campo?</label>
+          <select id="m18q2">
+            <option value="">Seleccione una opción</option>
+            <option value="a">Cursos y seminarios especializados.</option>
+            <option value="b">Redes sociales exclusivamente.</option>
+            <option value="c">Solo la experiencia laboral.</option>
+          </select>
+        </div>
+        <button type="button" onclick="evaluateModule18()">Enviar Evaluación</button>
+        <div id="resultModule18" class="result"></div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- MODAL CERTIFICADO -->
+  <div id="certificateModal" class="modal">
+    <div class="modal-content">
+      <h3><i class="fas fa-trophy"></i> ¡Felicidades!</h3>
+      <p>Has completado exitosamente el curso profesional de Liquidación de Sueldos en Argentina.</p>
+      <button onclick="downloadCertificate()">Descargar Certificado</button>
+      <br><br>
+      <button onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+  
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 Curso Profesional - Liquidación de Sueldos Argentina</p>
+  </footer>
+  
+  <!-- JAVASCRIPT -->
+  <script>
+    // Alternar modo claro/oscuro
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      document.querySelectorAll('.accordion').forEach(acc => acc.classList.toggle('dark'));
+    });
+    
+    // Función para el Accordion
+    document.querySelectorAll('.accordion h3').forEach(header => {
+      header.addEventListener('click', () => {
+        header.parentElement.classList.toggle('active');
+      });
+    });
+    
+    // Funciones de evaluación para cada módulo (2 preguntas por módulo)
+    function evaluateModule1() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m1q1').value;
+      const ans2 = document.getElementById('m1q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "c") score++;
+      document.getElementById('resultModule1').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module2'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule2() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m2q1').value;
+      const ans2 = document.getElementById('m2q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "c") score++;
+      document.getElementById('resultModule2').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module3'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule3() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m3q1').value;
+      const ans2 = document.getElementById('m3q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule3').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module4'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule4() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m4q1').value;
+      const ans2 = document.getElementById('m4q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule4').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module5'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule5() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m5q1').value;
+      const ans2 = document.getElementById('m5q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule5').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module6'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule6() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m6q1').value;
+      const ans2 = document.getElementById('m6q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "c") score++;
+      document.getElementById('resultModule6').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module7'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule7() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m7q1').value;
+      const ans2 = document.getElementById('m7q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule7').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module8'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule8() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m8q1').value;
+      const ans2 = document.getElementById('m8q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule8').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module9'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule9() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m9q1').value;
+      const ans2 = document.getElementById('m9q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "b") score++;
+      document.getElementById('resultModule9').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module10'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule10() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m10q1').value;
+      const ans2 = document.getElementById('m10q2').value;
+      if(ans1 === "c") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule10').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module11'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule11() {
+      alert('Actividad completada. Presiona "Siguiente" para avanzar al Módulo 12.');
+    }
+    function evaluateModule12() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m12q1').value;
+      const ans2 = document.getElementById('m12q2').value;
+      if(ans1 === "b") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule12').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module13'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule13() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m13q1').value;
+      const ans2 = document.getElementById('m13q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "b") score++;
+      document.getElementById('resultModule13').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module14'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule14() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m14q1').value;
+      const ans2 = document.getElementById('m14q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule14').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module15'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule15() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m15q1').value;
+      const ans2 = document.getElementById('m15q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule15').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module16'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateModule16() {
+      let score = 0;
+      const total = 2;
+      const ans1 = document.getElementById('m16q1').value;
+      const ans2 = document.getElementById('m16q2').value;
+      if(ans1 === "a") score++;
+      if(ans2 === "a") score++;
+      document.getElementById('resultModule16').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) unlockModule('module17'); else alert('Revisa el material y vuelve a intentarlo.');
+    }
+    function evaluateFinal() {
+      let score = 0;
+      const total = 6;
+      const fq1 = document.getElementById('fq1').value;
+      const fq2 = document.getElementById('fq2').value;
+      const fq3 = document.getElementById('fq3').value;
+      const fq4 = document.getElementById('fq4').value;
+      const fq5 = document.getElementById('fq5').value;
+      const fq6 = document.getElementById('fq6').value;
+      
+      if(fq1 === "b") score++;
+      if(fq2 === "c") score++;
+      if(fq3 === "a") score++;
+      if(fq4 === "a") score++;
+      if(fq5 === "b") score++;
+      if(fq6 === "a") score++;
+      
+      document.getElementById('resultFinal').textContent = `Obtuviste ${score} de ${total}`;
+      if(score === total) {
+        showCertificateModal();
+      } else {
+        alert('Revisa el material y vuelve a intentarlo para obtener el certificado.');
+      }
+    }
+    
+    // Función para desbloquear módulos
+    function unlockModule(moduleId) {
+      const module = document.getElementById(moduleId);
+      if(module) {
+        if(module.classList.contains('locked')) {
+          module.classList.remove('locked');
+          module.style.display = "block";
+          module.style.animation = "fadeInUp 1s ease-out";
+          alert(`¡Felicidades! Has desbloqueado ${moduleId.toUpperCase()}.`);
+        }
+      } else {
+        console.error(`Elemento con id "${moduleId}" no encontrado.`);
+      }
+    }
+    
+    // Calculadora Básica
+    function calculateBasic() {
+      const gross = parseFloat(document.getElementById('basicGrossSalary').value);
+      const ded = parseFloat(document.getElementById('basicDeduction').value);
+      const resultDiv = document.getElementById('basicResult');
+      if(isNaN(gross) || isNaN(ded)) {
+        resultDiv.textContent = "Por favor, ingresa valores válidos.";
+        return;
+      }
+      const net = gross - (gross * (ded / 100));
+      resultDiv.textContent = `Salario Neto: $${net.toFixed(2)}`;
+    }
+    
+    // Calculadora Avanzada
+    function calculateAdvanced() {
+      const gross = parseFloat(document.getElementById('advancedGrossSalary').value);
+      const dedJ = parseFloat(document.getElementById('deductionJubilatorio').value);
+      const dedOS = parseFloat(document.getElementById('deductionObraSocial').value);
+      const dedP = parseFloat(document.getElementById('deductionPAMI').value);
+      const resultDiv = document.getElementById('advancedResult');
+      if(isNaN(gross) || isNaN(dedJ) || isNaN(dedOS) || isNaN(dedP)) {
+        resultDiv.textContent = "Por favor, ingresa todos los valores válidos.";
+        return;
+      }
+      const totalDeduction = dedJ + dedOS + dedP;
+      const net = gross - (gross * (totalDeduction / 100));
+      resultDiv.textContent = `Salario Neto Avanzado: $${net.toFixed(2)}`;
+    }
+    
+    // Completar Recibo de Sueldo
+    function completePayslip() {
+      const percent = parseFloat(document.getElementById('ps_percent').value);
+      const resultDiv = document.getElementById('payslipResult');
+      if(isNaN(percent)) {
+        resultDiv.textContent = "Por favor, ingresa un porcentaje válido.";
+        return;
+      }
+      const bruto = 120000 + 8000;
+      const jubilatorios = bruto * (11 / 100);
+      const obraSocial = bruto * (3 / 100);
+      const pami = bruto * (3 / 100);
+      const totalDescuento = bruto * (percent / 100);
+      const neto = bruto - totalDescuento;
+      
+      document.getElementById('ps_jubilatorios').textContent = jubilatorios.toFixed(2);
+      document.getElementById('ps_os').textContent = obraSocial.toFixed(2);
+      document.getElementById('ps_pami').textContent = pami.toFixed(2);
+      document.getElementById('ps_neto').textContent = neto.toFixed(2);
+      resultDiv.textContent = `Recibo completado. Líquido a Recibir: $${neto.toFixed(2)}`;
+    }
+    
+    // Modal del Certificado
+    function showCertificateModal() {
+      document.getElementById('certificateModal').style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById('certificateModal').style.display = "none";
+    }
+    function downloadCertificate() {
+      alert("Certificado descargado (función simulada).");
+    }
+
+    //evaluacion final
+
+      // Sonidos de feedback
+  const correctSound = new Audio('https://www.myinstants.com/media/sounds/correct-answer.mp3');
+  const wrongSound = new Audio('https://www.myinstants.com/media/sounds/wrong-answer.mp3');
+
+  // Objeto para almacenar resultados de cada actividad
+  const results = {
+    activity1: false, activity2: false, activity3: false, activity4: false,
+    activity5: false, activity6: false, activity7: false, activity8: false,
+    activity9: false, activity10: false, activity11: false, activity12: false,
+    activity13: false, activity14: false, activity15: false, activity16: false,
+    activity17: false, activity18: false, activity19: false, activity20: false
+  };
+
+  // Función de validación general para actividades con cálculo
+  function checkActivity(id, bruto, deducPercent, inputId, feedbackId) {
+    const input = parseFloat(document.getElementById(inputId).value);
+    const correct = bruto - (bruto * deducPercent);
+    const feedback = document.getElementById(feedbackId);
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ ¡Correcto! $" + correct.toFixed(2) + "</span>";
+      results[id] = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto. Intenta de nuevo.</span>";
+      results[id] = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 1: Caso Real
+  function checkActivity1() { checkActivity('activity1', 200000, 0.17, 'netSalary1', 'feedback1'); }
+  // Actividad 2
+  function checkActivity2() {
+    const answer = document.getElementById("activity2_q").value;
+    const feedback = document.getElementById("feedback2");
+    if (answer === "b") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity2 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity2 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 3
+  function checkActivity3() {
+    const answer = document.getElementById("activity3_q").value;
+    const feedback = document.getElementById("feedback3");
+    if (answer === "b") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity3 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity3 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 4
+  function checkActivity4() {
+    const input = parseFloat(document.getElementById("activity4_input").value);
+    const feedback = document.getElementById("feedback4");
+    if (Math.abs(input - 0.17) < 0.01) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity4 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto. Recuerda que las deducciones totales son 17%.</span>";
+      results.activity4 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 5
+  function checkActivity5() {
+    const answer = document.getElementById("activity5_q").value;
+    const feedback = document.getElementById("feedback5");
+    if (answer === "false") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity5 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity5 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 6
+  function checkActivity6() {
+    const input = parseFloat(document.getElementById("activity6_input").value);
+    const correct = 150000 * 0.11;
+    const feedback = document.getElementById("feedback6");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity6 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity6 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 7
+  function checkActivity7() {
+    const input = parseFloat(document.getElementById("activity7_input").value);
+    const correct = 150000 * 0.03;
+    const feedback = document.getElementById("feedback7");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity7 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity7 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 8
+  function checkActivity8() {
+    const input = parseFloat(document.getElementById("activity8_input").value);
+    const correct = 150000 * 0.03;
+    const feedback = document.getElementById("feedback8");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity8 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity8 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 9
+  function checkActivity9() {
+    const input = parseFloat(document.getElementById("activity9_input").value);
+    const correct = (150000 * 0.11) + (150000 * 0.03) + (150000 * 0.03);
+    const feedback = document.getElementById("feedback9");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity9 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity9 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 10
+  function checkActivity10() {
+    const input = parseFloat(document.getElementById("activity10_input").value);
+    const correct = 150000 - (150000 * 0.17);
+    const feedback = document.getElementById("feedback10");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity10 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity10 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 11
+  function checkActivity11() {
+    const a1 = document.getElementById("activity11_q1").value;
+    const a2 = document.getElementById("activity11_q2").value;
+    const a3 = document.getElementById("activity11_q3").value;
+    const feedback = document.getElementById("feedback11");
+    if (a1 === "11" && a2 === "3" && a3 === "3") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity11 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto. Revise los porcentajes.</span>";
+      results.activity11 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 12
+  function checkActivity12() {
+    const input = parseFloat(document.getElementById("activity12_input").value);
+    const correct = 250000 - (250000 * 0.17);
+    const feedback = document.getElementById("feedback12");
+    if (Math.abs(input - correct) < 1) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto: $" + correct.toFixed(2) + "</span>";
+      results.activity12 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity12 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 13
+  function checkActivity13() {
+    const answer = document.getElementById("activity13_q").value;
+    const feedback = document.getElementById("feedback13");
+    if (answer === "a") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity13 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity13 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 14
+  function checkActivity14() {
+    const answer = document.getElementById("activity14_q").value;
+    const feedback = document.getElementById("feedback14");
+    if (answer === "true") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity14 = true;
+      correctSound.play();
+    } else if (answer === "false") {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto. La respuesta correcta es Verdadero.</span>";
+      results.activity14 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 15
+  function calculateInteractive() {
+    const gross = parseFloat(document.getElementById("activity15_gross").value);
+    const pct = parseFloat(document.getElementById("activity15_pct").value);
+    const net = gross - (gross * (pct/100));
+    const feedback = document.getElementById("feedback15");
+    if (!isNaN(net)) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>Salario Neto: $" + net.toFixed(2) + "</span>";
+      results.activity15 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>Ingrese valores válidos.</span>";
+      results.activity15 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 16
+  function checkActivity16() {
+    const nombre = document.getElementById("activity16_nombre").value;
+    const cuil = document.getElementById("activity16_cuil").value;
+    const feedback = document.getElementById("feedback16");
+    if (nombre && cuil) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Datos guardados correctamente.</span>";
+      results.activity16 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Complete todos los campos.</span>";
+      results.activity16 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 17
+  function checkActivity17() {
+    const response = document.getElementById("activity17_text").value.trim();
+    const feedback = document.getElementById("feedback17");
+    if (response.length > 10) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Gracias por su respuesta.</span>";
+      results.activity17 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Amplíe su respuesta.</span>";
+      results.activity17 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 18
+  function checkActivity18() {
+    const answer = document.getElementById("activity18_q").value;
+    const feedback = document.getElementById("feedback18");
+    if (answer === "20.744") {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto.</span>";
+      results.activity18 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Incorrecto.</span>";
+      results.activity18 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 19
+  function checkActivity19() {
+    const response = document.getElementById("activity19_text").value.trim();
+    const feedback = document.getElementById("feedback19");
+    if (response.length > 15) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Gracias por compartir su reflexión.</span>";
+      results.activity19 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ Amplíe su respuesta.</span>";
+      results.activity19 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+  // Actividad 20
+  function checkActivity20() {
+    const response = document.getElementById("activity20_text").value.toLowerCase();
+    const feedback = document.getElementById("feedback20");
+    if (response.includes("salario bruto") && response.includes("deducciones")) {
+      feedback.innerHTML = "<span class='animate__animated animate__rubberBand' style='color:green;'>✅ Correcto. Recuerda: Salario Neto = Salario Bruto - (Salario Bruto x % deducciones)</span>";
+      results.activity20 = true;
+      correctSound.play();
+    } else {
+      feedback.innerHTML = "<span class='animate__animated animate__shakeX' style='color:red;'>❌ La respuesta no es completa.</span>";
+      results.activity20 = false;
+      wrongSound.play();
+    }
+    updateProgress();
+  }
+
+  // Función para actualizar la barra de progreso
+  function updateProgress() {
+    let completed = 0;
+    for (let key in results) {
+      if (results[key] === true) completed++;
+    }
+    document.getElementById("progressBar").value = completed;
+    document.getElementById("progressText").textContent = completed + "/20 actividades completadas";
+  }
+
+  // Temporizador de 45 minutos (2700 segundos)
+  let timeLeft = 2700;
+  const timeDisplay = document.getElementById("timeDisplay");
+  const timerInterval = setInterval(function() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timeDisplay.textContent = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      finishTest();
+    }
+    timeLeft--;
+  }, 1000);
+
+  // Función para finalizar la evaluación y mostrar resultados
+  function finishTest() {
+    // Deshabilitar todos los inputs, selects, textareas y el botón de finalizar
+    document.querySelectorAll("#module17 input, #module17 select, #module17 textarea, #finishTestBtn").forEach(function(elem) {
+      elem.disabled = true;
+    });
+    clearInterval(timerInterval);
+    let correctCount = 0;
+    let total = Object.keys(results).length;
+    for (let key in results) {
+      if (results[key] === true) correctCount++;
+    }
+    let percentage = (correctCount / total) * 100;
+    const finalResult = document.getElementById("finalResult");
+    finalResult.innerHTML = "<i class='fas fa-trophy'></i> Resumen Final: " + correctCount + " de " + total + " actividades correctas (" + percentage.toFixed(1) + "%).<br>";
+    if (percentage >= 80) {
+      finalResult.innerHTML += "<span style='color:green; font-size:1.3rem;'><i class='fas fa-smile'></i> ¡Aprobaste el examen!</span>";
+      // Lanzar confeti
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } else {
+      finalResult.innerHTML += "<span style='color:red; font-size:1.3rem;'><i class='fas fa-frown'></i> No aprobaste, sigue practicando.</span>";
+    }
+    // Mostrar botón para reiniciar
+    document.getElementById("resetTestBtn").style.display = "inline-block";
+  }
+
+  // Función para reiniciar el examen
+  function resetTest() {
+    location.reload();
+  }
+
+  // Función para iniciar el examen: oculta el modal y muestra el módulo
+  function startExam() {
+    document.getElementById("instructionsModal").style.display = "none";
+    document.getElementById("module17").style.display = "block";
+  }
+
+      // Función para cerrar sesión
+      function logout() {
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      window.location.href = "login.html"; // Asegúrate de que esta ruta sea la correcta para tu login
+    }
+
+    // Verificar si hay sesión activa usando la misma clave "user"
+    document.addEventListener("DOMContentLoaded", function() {
+      if (!localStorage.getItem("user") && !sessionStorage.getItem("user")) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Cargar datos del usuario y actualizar el progreso
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Obtener el usuario desde sessionStorage (clave "user")
+      const user = JSON.parse(sessionStorage.getItem("user"));
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+  
+  // Inicialización del cliente de Supabase
+  window.supabase = supabase.createClient(
+    'https://hygdbhdujdvtuuagwfit.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5Z2RiaGR1amR2dHV1YWd3Zml0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg3Nzg3MzUsImV4cCI6MjA1NDM1NDczNX0.jDIZD6cXQHjkojSg_vJ0Q_cvTXVEG_B_NaiRnJZTDas'
+  );
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  
+  document.getElementById("nombre").innerText = user.nombre || "N/A";
+  document.getElementById("apellido").innerText = user.apellido || "N/A";
+  document.getElementById("email").innerText = user.email || "N/A";
+  document.getElementById("celular").innerText = user.celular || "N/A";
+
+  async function loadUserData() {
+    try {
+      const { data: progreso, error } = await supabase
+        .from("avance_curso")
+        .select("*")
+        .eq("alumno_id", user.id)
+        .single();
+
+      if (error || !progreso) {
+        document.getElementById("modulo_actual").innerText = "Sin progreso";
+        document.getElementById("porcentaje_completado").innerText = "0";
+        document.getElementById("progress").style.width = "0%";
+        document.getElementById("mensaje_motivacional").innerText = "Empieza tu aprendizaje hoy.";
+      } else {
+        document.getElementById("modulo_actual").innerText = progreso.modulo_actual;
+        document.getElementById("porcentaje_completado").innerText = progreso.porcentaje_completado;
+        document.getElementById("progress").style.width = progreso.porcentaje_completado + "%";
+        document.getElementById("mensaje_motivacional").innerText = progreso.mensaje_motivacional || "¡Sigue adelante!";
+        
+// Desbloquear módulos hasta el módulo en el que se quedó
+for (let i = 1; i <= progreso.modulo_actual; i++) {
+  let modulo = document.getElementById(`module${i}`);
+  if (modulo) {
+    modulo.classList.remove("locked");
+
+    // Para los módulos anteriores al actual, ocultar preguntas y el botón de evaluación
+    if (i < progreso.modulo_actual) {
+      // Ocultar todas las preguntas del quiz dentro del módulo
+      let quizQuestions = modulo.getElementsByClassName("quiz-question");
+      for (let j = 0; j < quizQuestions.length; j++) {
+        quizQuestions[j].style.display = "none";
+      }
+
+      // Ocultar el botón de evaluación (por ejemplo, <button type="button" onclick="evaluateModule10()">Enviar Evaluación</button>)
+      let evalButton = modulo.querySelector("button[onclick^='evaluateModule']");
+      if (evalButton) {
+        evalButton.style.display = "none";
+      }
+
+      // Agregar el cartel de "Módulo Aprobado" solo una vez por módulo
+      if (!modulo.querySelector(".approved-banner")) {
+        const approvedBanner = document.createElement('div');
+        approvedBanner.className = 'approved-banner';
+        approvedBanner.innerHTML = '<i class="fas fa-check-circle"></i> ¡Módulo Aprobado!';
+        modulo.appendChild(approvedBanner);
+      }
+    }
+  }
+}
+
+
+
+
+
+      }
+    } catch (error) {
+      console.error("Error al cargar datos del usuario:", error.message);
+    }
+  }
+
+  async function actualizarProgreso(moduloActual, porcentajeCompletado) {
+    try {
+      if (!user || !user.id) {
+        console.error("El objeto 'user' o su id no están definidos.");
+        return;
+      }
+      
+      console.log(`Actualizando progreso: módulo ${moduloActual} y ${porcentajeCompletado}%`);
+
+      const { error } = await supabase
+        .from("avance_curso")
+        .upsert(
+          {
+            alumno_id: user.id,
+            modulo_actual: moduloActual,
+            porcentaje_completado: porcentajeCompletado,
+            fecha_ultimo_acceso: new Date().toISOString()
+          },
+          { onConflict: 'alumno_id' }
+        );
+
+      if (error) {
+        console.error("Error al actualizar el progreso:", error.message);
+      } else {
+        console.log("Progreso actualizado correctamente");
+        
+        // Desbloquear módulos hasta el actual
+        for (let i = 1; i <= moduloActual; i++) {
+          let modulo = document.getElementById(`module${i}`);
+          if (modulo) {
+            modulo.classList.remove("locked");
+          }
+        }
+      }
+
+    } catch (err) {
+      console.error("Error en la función actualizarProgreso:", err);
+    }
+  }
+
+  async function evaluarModulo(modulo, respuestasCorrectas) {
+    let aprobado = respuestasCorrectas.every((respuesta, index) => {
+      return document.getElementById(`m${modulo}q${index + 1}`).value === respuesta;
+    });
+
+    const resultado = document.getElementById(`resultModule${modulo}`);
+    const quizSection = document.getElementById(`quizModule${modulo}`);
+    const moduleSection = document.getElementById(`module${modulo}`);
+
+    if (aprobado) {
+      resultado.innerText = "¡Aprobaste el módulo!";
+      const totalModulos = 18;
+      const porcentaje = (modulo / totalModulos) * 100;
+      await actualizarProgreso(modulo, porcentaje);
+
+      // Animación de aprobación
+      moduleSection.classList.add('module-approved');
+      
+      // Crear y mostrar el cartel de aprobado
+      const approvedBanner = document.createElement('div');
+      approvedBanner.className = 'approved-banner';
+      approvedBanner.innerHTML = '<i class="fas fa-check-circle"></i> ¡Módulo Aprobado!';
+      moduleSection.appendChild(approvedBanner);
+
+      // Ocultar las preguntas con una animación
+      quizSection.style.transition = 'opacity 0.5s, height 0.5s';
+      quizSection.style.opacity = '0';
+      quizSection.style.height = '0';
+      setTimeout(() => {
+        quizSection.style.display = 'none';
+      }, 500);
+
+      // Desbloquear el siguiente módulo si existe
+      const nextModule = document.getElementById(`module${modulo + 1}`);
+      if (nextModule) {
+        nextModule.classList.remove('locked');
+        nextModule.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      resultado.innerText = "Algunas respuestas son incorrectas. Intenta de nuevo.";
+      resultado.classList.add('shake');
+      setTimeout(() => {
+        resultado.classList.remove('shake');
+      }, 500);
+    }
+  }
+
+  document.querySelectorAll(".module").forEach((modulo, index) => {
+    modulo.addEventListener("click", () => {
+      if (!modulo.classList.contains('locked')) {
+        actualizarProgreso(index + 1, ((index + 1) / 18) * 100);
+      }
+    });
+  });
+
+  loadUserData();
+});
+
+
+
+  </script>
+</body>
+</html>
